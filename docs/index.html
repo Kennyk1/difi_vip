@@ -21,7 +21,7 @@
         button.addEventListener('click', () => {
             resultDiv.innerHTML = "Loading...";
 
-            fetch('https://sample-api-rucj.onrender.com/') // Your Render API URL
+            fetch('https://sample-api-1-ryj7.onrender.com/') // Your Render API URL
                 .then(response => response.json())
                 .then(data => {
                     resultDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
