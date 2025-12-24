@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Check Render API</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        pre { background: #f4f4f4; padding: 15px; border-radius: 5px; display: inline-block; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Render API Checker</h1>
+    <button id="checkBtn">Check Server</button>
+    <div id="result"></div>
+
+    <script>
+        const button = document.getElementById('checkBtn');
+        const resultDiv = document.getElementById('result');
+
+        button.addEventListener('click', () => {
+            resultDiv.innerHTML = "Loading...";
+
+            fetch('https://sample-api-rucj.onrender.com/') // Your Render API URL
+                .then(response => response.json())
+                .then(data => {
+                    resultDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                })
+                .catch(err => {
+                    resultDiv.innerHTML = `<pre style="color:red">Error: ${err}</pre>`;
+                });
+        });
+    </script>
+</body>
+</html>
