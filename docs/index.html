@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FXC Bot Looters - DeFi Products Auto Registration</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 FXC Bot Looters</h1>
+            <p class="subtitle">DeFi Products Automated Account Creation</p>
+            <div class="api-status" id="apiStatus">
+                <span class="status-dot"></span>
+                <span class="status-text">Checking API...</span>
+            </div>
+        </header>
+
+        <div class="info-banner">
+            <h3>📌 Important Information</h3>
+            <p>✅ Your promo code (referral code) is <strong>required</strong> to create accounts</p>
+            <p>✅ Get your 6-digit promo code from your DeFi Products account</p>
+            <p>✅ Don't have an account? Register at <a href="https://defiproducts.vip" target="_blank">defiproducts.vip</a></p>
+        </div>
+
+        <div class="main-content">
+            <div class="card create-card">
+                <h2>🎯 Create Accounts</h2>
+                <div id="createMessage" class="message"></div>
+                
+                <form id="createForm">
+                    <div class="form-group">
+                        <label>
+                            Promo Code (Referral) <span class="required">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="promoCode" 
+                            placeholder="Enter 6-digit promo code" 
+                            maxlength="6"
+                            required
+                        >
+                        <p class="info-text">Example: 791580</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Number of Accounts <span class="required">*</span>
+                        </label>
+                        <input 
+                            type="number" 
+                            id="accountCount" 
+                            min="1" 
+                            max="50" 
+                            value="1" 
+                            required
+                        >
+                        <p class="info-text">Maximum: 50 accounts per batch</p>
+                    </div>
+
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill">
+                                <span id="progressText">0%</span>
+                            </div>
+                        </div>
+                        <p class="progress-info" id="progressInfo"></p>
+                    </div>
+
+                    <button type="submit" id="createBtn" class="btn-primary">
+                        <span class="btn-icon">🚀</span>
+                        Generate Accounts
+                    </button>
+                </form>
+            </div>
+
+            <div class="card login-card">
+                <h2>🔑 Access Your Accounts</h2>
+                <div id="loginMessage" class="message"></div>
+                
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>
+                            User ID <span class="required">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="userId" 
+                            placeholder="USER-1234567890-ABCD1234" 
+                            required
+                        >
+                        <p class="info-text">Enter your unique User ID to view accounts</p>
+                    </div>
+
+                    <button type="submit" id="loginBtn" class="btn-primary">
+                        <span class="btn-icon">🔓</span>
+                        View My Accounts
+                    </button>
+                </form>
+
+                <div class="quick-actions">
+                    <button onclick="downloadAccounts()" class="btn-secondary" id="downloadBtn" disabled>
+                        <span class="btn-icon">📥</span>
+                        Download Accounts
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="accounts-section card">
+            <div class="accounts-header">
+                <h2>📋 Your Accounts</h2>
+                <div class="account-stats-inline">
+                    <span class="stat-badge">
+                        <span class="stat-label">User:</span>
+                        <span id="currentUser" class="stat-value">Guest</span>
+                    </span>
+                    <span class="stat-badge success">
+                        <span class="stat-label">Total:</span>
+                        <span id="totalAccounts" class="stat-value">0</span>
+                    </span>
+                    <span class="stat-badge warning">
+                        <span class="stat-label">Success:</span>
+                        <span id="successAccounts" class="stat-value">0</span>
+                    </span>
+                </div>
+            </div>
+
+            <div id="accountsList" class="accounts-list">
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <h3>No Accounts Yet</h3>
+                    <p>Create your first batch of accounts to get started!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>FXC Bot Looters © 2024 | DeFi Products Platform</p>
+        <p><a href="https://defiproducts.vip" target="_blank">Visit DeFi Products</a></p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
