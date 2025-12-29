@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Accounts - FXC Bot Looters</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        /* Additional styles for accounts page */
+        .accounts-header-section {
+            background: linear-gradient(135deg, rgba(255,59,59,0.1) 0%, rgba(99,102,241,0.1) 100%);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .accounts-header-section h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .accounts-header-section p {
+            color: var(--gray);
+            font-size: 1.1em;
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-overview-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .stat-overview-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.08);
+        }
+
+        .stat-overview-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .stat-overview-number {
+            font-size: 2.5em;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-overview-label {
+            color: var(--gray);
+            font-size: 0.9em;
+        }
+
+        .filters-section {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-size: 0.9em;
+            color: var(--gray-light);
+            font-weight: 600;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: white;
+            font-size: 0.95em;
+            transition: all 0.3s;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255,255,255,0.08);
+        }
+
+        .filter-group select {
+            cursor: pointer;
+        }
+
+        .btn-filter {
+            padding: 12px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .btn-filter:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .accounts-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .actions-left h2 {
+            font-size: 1.6em;
+        }
+
+        .actions-right {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-download-all {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-download-all:hover:not(:disabled) {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .btn-refresh {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-refresh:hover {
+            background: #5558d9;
+            transform: translateY(-2px);
+        }
+
+        .btn-action:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .accounts-container {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .accounts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 700px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .accounts-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .accounts-list::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+
+        .accounts-list::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .account-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .account-card:hover {
+            background: rgba(255,255,255,0.05);
+            transform: translateX(5px);
+        }
+
+        .account-card.defi {
+            border-left: 4px solid var(--primary);
+        }
+
+        .account-card.darino {
+            border-left: 4px solid #6366f1;
+        }
+
+        .account-card.failed {
+            opacity: 0.7;
+            background: rgba(220, 38, 38, 0.05);
+        }
+
+        .account-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .account-card-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bot-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .bot-badge.defi {
+            background: rgba(255,59,59,0.2);
+            color: var(--primary);
+        }
+
+        .bot-badge.darino {
+            background: rgba(99,102,241,0.2);
+            color: #8b5cf6;
+        }
+
+        .account-number {
+            font-weight: 700;
+            font-size: 1em;
+            color: white;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-badge.success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-badge.failed {
+            background: rgba(220, 38, 38, 0.2);
+            color: #DC2626;
+        }
+
+        .account-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .detail-label {
+            font-size: 0.85em;
+            color: var(--gray);
+            font-weight: 600;
+        }
+
+        .detail-value {
+            font-size: 0.95em;
+            color: white;
+            word-break: break-all;
+        }
+
+        .btn-copy-small {
+            padding: 6px 12px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 5px;
+        }
+
+        .btn-copy-small:hover {
+            background: #059669;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--gray);
+        }
+
+        .empty-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 968px) {
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions-right {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .btn-action {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .account-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Loading Screen -->
+    <div class="auth-loading">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">🚀 FXC Bot Looters</div>
+            </div>
+
+            <nav class="nav-menu">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="dashboard.html" class="nav-item" id="nav-dashboard">
+                        <span class="nav-icon">🏠</span>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="accounts.html" class="nav-item active" id="nav-accounts">
+                        <span class="nav-icon">📋</span>
+                        <span>My Accounts</span>
+                    </a>
+                    <a href="referral.html" class="nav-item" id="nav-referral">
+                        <span class="nav-icon">🎯</span>
+                        <span>Referral</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Bots</div>
+                    <a href="defi.html" class="nav-item" id="nav-defi">
+                        <span class="nav-icon">💎</span>
+                        <span>DeFi Products</span>
+                    </a>
+                    <a href="darino.html" class="nav-item" id="nav-darino">
+                        <span class="nav-icon">🎯</span>
+                        <span>Darino</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="profile.html" class="nav-item" id="nav-profile">
+                        <span class="nav-icon">👤</span>
+                        <span>Profile</span>
+                    </a>
+                    <a href="#" class="nav-item" onclick="logout(); return false;">
+                        <span class="nav-icon">🚪</span>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="top-bar-left">
+                    <div class="mobile-menu-toggle" onclick="toggleSidebar()">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div>
+                        <h1>My Accounts</h1>
+                        <div class="breadcrumb">Home / My Accounts</div>
+                    </div>
+                </div>
+
+                <div class="top-bar-right">
+                    <div class="user-profile" onclick="toggleUserDropdown()">
+                        <div class="user-avatar" id="userAvatar">U</div>
+                        <div class="user-info">
+                            <div class="user-name" id="userName">User</div>
+                            <div class="user-role">Member</div>
+                        </div>
+                        
+                        <div class="dropdown-menu" id="userDropdown">
+                            <a href="profile.html" class="dropdown-item">
+                                <span>👤</span> Profile
+                            </a>
+                            <a href="referral.html" class="dropdown-item">
+                                <span>🎯</span> Referral
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item" onclick="logout(); return false;">
+                                <span>🚪</span> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Header Section -->
+                <div class="accounts-header-section">
+                    <h1>📋 All Your Accounts</h1>
+                    <p>Manage all your bot accounts in one place</p>
+                </div>
+
+                <!-- Stats Overview -->
+                <div class="stats-overview">
+                    <div class="stat-overview-card">
+                        <div class="stat-overview-icon">📊</div>
+                        <div class="stat-overview-number" id="totalCount">0</div>
+                        <div class="stat-overview-label">Total Accounts</div>
+                    </div>
+                    <div class="stat-overview-card">
+                        <div class="stat-overview-icon">💎</div>
+                        <div class="stat-overview-number" id="defiCount">0</div>
+                        <div class="stat-overview-label">DeFi Accounts</div>
+                    </div>
+                    <div class="stat-overview-card">
+                        <div class="stat-overview-icon">🎯</div>
+                        <div class="stat-overview-number" id="darinoCount">0</div>
+                        <div class="stat-overview-label">Darino Accounts</div>
+                    </div>
+                    <div class="stat-overview-card">
+                        <div class="stat-overview-icon">✅</div>
+                        <div class="stat-overview-number" id="successCount">0</div>
+                        <div class="stat-overview-label">Successful</div>
+                    </div>
+                </div>
+
+                <!-- Filters Section -->
+                <div class="filters-section">
+                    <div class="filters-grid">
+                        <div class="filter-group">
+                            <label>🔍 Search</label>
+                            <input 
+                                type="text" 
+                                id="searchInput" 
+                                placeholder="Search by email..."
+                                onkeyup="filterAccounts()"
+                            >
+                        </div>
+                        <div class="filter-group">
+                            <label>🤖 Bot Type</label>
+                            <select id="botFilter" onchange="filterAccounts()">
+                                <option value="all">All Bots</option>
+                                <option value="defi">DeFi Products</option>
+                                <option value="darino">Darino</option>
+                            </select>
+                        </div>
+                        <button class="btn-filter" onclick="resetFilters()">
+                            🔄 Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Accounts Actions -->
+                <div class="accounts-actions">
+                    <div class="actions-left">
+                        <h2>Accounts (<span id="displayedCount">0</span>)</h2>
+                    </div>
+                    <div class="actions-right">
+                        <button class="btn-action btn-download-all" id="downloadBtn" onclick="downloadAllAccounts()" disabled>
+                            <span>📥</span> Download All
+                        </button>
+                        <button class="btn-action btn-refresh" onclick="refreshAccounts()">
+                            <span>🔄</span> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Accounts Container -->
+                <div class="accounts-container">
+                    <div class="accounts-list" id="accountsList">
+                        <div class="loading-state">
+                            <div class="loading-spinner"></div>
+                            <p style="color: var(--gray);">Loading accounts...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="dashboard.js"></script>
+    <script>
+        let allAccounts = [];
+        let filteredAccounts = [];
+
+        // Load All Accounts
+        async function loadAllAccounts() {
+            try {
+                const response = await apiCall('/dashboard/accounts');
+                
+                if (response && response.success) {
+                    allAccounts = response.accounts || [];
+                    filteredAccounts = [...allAccounts];
+                    updateStats();
+                    displayAccounts(filteredAccounts);
+                } else {
+                    allAccounts = [];
+                    filteredAccounts = [];
+                    displayAccounts([]);
+                }
+            } catch (error) {
+                console.error('Error loading accounts:', error);
+                allAccounts = [];
+                filteredAccounts = [];
+                displayAccounts([]);
+            }
+        }
+
+        // Update Stats
+        function updateStats() {
+            const total = allAccounts.length;
+            const defi = allAccounts.filter(acc => acc.bot_type === 'defi').length;
+            const darino = allAccounts.filter(acc => acc.bot_type === 'darino').length;
+            const success = allAccounts.filter(acc => acc.status === 'success').length;
+
+            document.getElementById('totalCount').textContent = formatNumber(total);
+            document.getElementById('defiCount').textContent = formatNumber(defi);
+            document.getElementById('darinoCount').textContent = formatNumber(darino);
+            document.getElementById('successCount').textContent = formatNumber(success);
+
+            // Enable download if accounts exist
+            document.getElementById('downloadBtn').disabled = total === 0;
+        }
+
+        // Display Accounts
+        function displayAccounts(accounts) {
+            const accountsList = document.getElementById('accountsList');
+            const displayedCount = document.getElementById('displayedCount');
+
+            displayedCount.textContent = accounts.length;
+
+            if (accounts.length === 0) {
+                accountsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <h3>No Accounts Found</h3>
+                        <p>Create your first accounts using the bots!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            accountsList.innerHTML = accounts.map((acc, index) => `
+                <div class="account-card ${acc.bot_type} ${acc.status}">
+                    <div class="account-card-header">
+                        <div class="account-card-title">
+                            <span class="bot-badge ${acc.bot_type}">
+                                ${acc.bot_type === 'defi' ? '💎 DeFi' : '🎯 Darino'}
+                            </span>
+                            <span class="account-number">${acc.email}</span>
+                        </div>
+                        <span class="status-badge ${acc.status}">${acc.status}</span>
+                    </div>
+                    <div class="account-details">
+                        <div class="detail-item">
+                            <span class="detail-label">📧 Email</span>
+                            <span class="detail-value">${acc.email}</span>
+                            <button class="btn-copy-small" onclick="copyToClipboard('${acc.email}')">Copy</button>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">🔑 Password</span>
+                            <span class="detail-value">${acc.password}</span>
+                            <button class="btn-copy-small" onclick="copyToClipboard('${acc.password}')">Copy</button>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">🎫 Promo Code</span>
+                            <span class="detail-value">${acc.promo_code || 'None'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">📅 Created</span>
+                            <span class="detail-value">${new Date(acc.created_at).toLocaleString()}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filter Accounts
+        function filterAccounts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const botType = document.getElementById('botFilter').value;
+
+            filteredAccounts = allAccounts.filter(acc => {
+                const matchesSearch = acc.email.toLowerCase().includes(searchTerm);
+                const matchesBotType = botType === 'all' || acc.bot_type === botType;
+                return matchesSearch && matchesBotType;
+            });
+
+            displayAccounts(filteredAccounts);
+        }
+
+        // Reset Filters
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('botFilter').value = 'all';
+            filteredAccounts = [...allAccounts];
+            displayAccounts(filteredAccounts);
+        }
+
+        // Refresh Accounts
+        async function refreshAccounts() {
+            showToast('Refreshing accounts...', 'success');
+            await loadAllAccounts();
+            showToast('Accounts refreshed!', 'success');
+        }
+
+        // Download All Accounts
+        function downloadAllAccounts() {
+            if (allAccounts.length === 0) return;
+
+            let content = '='.repeat(80) + '\n';
+            content += 'FXC BOT LOOTERS - ALL ACCOUNTS\n';
+            content += '='.repeat(80) + '\n';
+            content += `Generated: ${new Date().toLocaleString()}\n`;
+            content += `Total Accounts: ${allAccounts.length}\n`;
+            content += '='.repeat(80) + '\n\n';
+
+            // Group by bot type
+            const defiAccounts = allAccounts.filter(acc => acc.bot_type === 'defi');
+            const darinoAccounts = allAccounts.filter(acc => acc.bot_type === 'darino');
+
+            if (defiAccounts.length > 0) {
+                content += '\n' + '='.repeat(80) + '\n';
+                content += '💎 DEFI PRODUCTS ACCOUNTS\n';
+                content += '='.repeat(80) + '\n\n';
+                defiAccounts.forEach((acc, idx) => {
+                    content += `Account #${idx + 1}:\n`;
+                    content += `  Email:    ${acc.email}\n`;
+                    content += `  Password: ${acc.password}\n`;
+                    content += `  Promo:    ${acc.promo_code}\n`;
+                    content += `  Status:   ${acc.status}\n`;
+                    content += `  Created:  ${new Date(acc.created_at).toLocaleString()}\n`;
+                    content += `  Format:   ${acc.email}:${acc.password}\n`;
+                    content += '-'.repeat(80) + '\n';
+                });
+            }
+
+            if (darinoAccounts.length > 0) {
+                content += '\n' + '='.repeat(80) + '\n';
+                content += '🎯 DARINO ACCOUNTS\n';
+                content += '='.repeat(80) + '\n\n';
+                darinoAccounts.forEach((acc, idx) => {
+                    content += `Account #${idx + 1}:\n`;
+                    content += `  Email:    ${acc.email}\n`;
+                    content += `  Password: ${acc.password}\n`;
+                    content += `  Promo:    ${acc.promo_code || 'None'}\n`;
+                    content += `  Status:   ${acc.status}\n`;
+                    content += `  Created:  ${new Date(acc.created_at).toLocaleString()}\n`;
+                    content += `  Format:   ${acc.email}:${acc.password}\n`;
+                    content += '-'.repeat(80) + '\n';
+                });
+            }
+
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `all_accounts_${Date.now()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            showToast('All accounts downloaded!', 'success');
+        }
+
+        // Initialize page
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Check authentication and initialize
+            const user = await initDashboard('nav-accounts');
+            
+            if (user) {
+                // Load all accounts
+                await loadAllAccounts();
+            }
+        });
+    </script>
+</body>
+</html>
