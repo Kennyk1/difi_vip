@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referral - FXC Bot Looters</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        /* Additional styles for referral page */
+        .referral-hero {
+            background: linear-gradient(135deg, rgba(255,59,59,0.1) 0%, rgba(99,102,241,0.1) 100%);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .referral-hero h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--primary) 0%, #FF6B6B 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .referral-hero p {
+            color: var(--gray);
+            font-size: 1.2em;
+        }
+
+        .referral-code-box {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,59,59,0.3);
+            border-radius: 20px;
+            padding: 35px;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .referral-code-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,59,59,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        .referral-code-label {
+            font-size: 0.9em;
+            color: var(--gray-light);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+
+        .referral-code {
+            font-size: 3em;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 5px;
+            position: relative;
+        }
+
+        .copy-button {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, #FF6B6B 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(255,59,59,0.3);
+        }
+
+        .copy-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255,59,59,0.4);
+        }
+
+        .copy-button:active {
+            transform: translateY(0);
+        }
+
+        .referral-link-box {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .referral-link {
+            flex: 1;
+            background: rgba(0,0,0,0.3);
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: var(--gray-light);
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+            font-size: 0.9em;
+        }
+
+        .share-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .share-btn {
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 1em;
+        }
+
+        .share-btn.twitter {
+            background: #1DA1F2;
+            color: white;
+        }
+
+        .share-btn.telegram {
+            background: #0088cc;
+            color: white;
+        }
+
+        .share-btn.whatsapp {
+            background: #25D366;
+            color: white;
+        }
+
+        .share-btn.facebook {
+            background: #1877F2;
+            color: white;
+        }
+
+        .share-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .referral-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .referral-stat-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .stat-icon-large {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .stat-number-large {
+            font-size: 2.5em;
+            font-weight: 800;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .stat-label-large {
+            color: var(--gray);
+            font-size: 0.95em;
+        }
+
+        .how-it-works {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .how-it-works h2 {
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+
+        .steps {
+            display: grid;
+            gap: 20px;
+        }
+
+        .step {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary) 0%, #FF6B6B 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            margin-bottom: 8px;
+            font-size: 1.2em;
+        }
+
+        .step-content p {
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .referral-code {
+                font-size: 2em;
+                letter-spacing: 3px;
+            }
+
+            .referral-link-box {
+                flex-direction: column;
+            }
+
+            .share-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Loading Screen -->
+    <div class="auth-loading">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">🚀 FXC Bot Looters</div>
+            </div>
+
+            <nav class="nav-menu">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="dashboard.html" class="nav-item" id="nav-dashboard">
+                        <span class="nav-icon">🏠</span>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="accounts.html" class="nav-item" id="nav-accounts">
+                        <span class="nav-icon">📋</span>
+                        <span>My Accounts</span>
+                    </a>
+                    <a href="referral.html" class="nav-item active" id="nav-referral">
+                        <span class="nav-icon">🎯</span>
+                        <span>Referral</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Bots</div>
+                    <a href="defi.html" class="nav-item" id="nav-defi">
+                        <span class="nav-icon">💎</span>
+                        <span>DeFi Products</span>
+                    </a>
+                    <a href="darino.html" class="nav-item" id="nav-darino">
+                        <span class="nav-icon">🎯</span>
+                        <span>Darino</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="profile.html" class="nav-item" id="nav-profile">
+                        <span class="nav-icon">👤</span>
+                        <span>Profile</span>
+                    </a>
+                    <a href="#" class="nav-item" onclick="logout(); return false;">
+                        <span class="nav-icon">🚪</span>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="top-bar-left">
+                    <div class="mobile-menu-toggle" onclick="toggleSidebar()">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div>
+                        <h1>Referral Program</h1>
+                        <div class="breadcrumb">Home / Referral</div>
+                    </div>
+                </div>
+
+                <div class="top-bar-right">
+                    <div class="user-profile" onclick="toggleUserDropdown()">
+                        <div class="user-avatar" id="userAvatar">U</div>
+                        <div class="user-info">
+                            <div class="user-name" id="userName">User</div>
+                            <div class="user-role">Member</div>
+                        </div>
+                        
+                        <div class="dropdown-menu" id="userDropdown">
+                            <a href="profile.html" class="dropdown-item">
+                                <span>👤</span> Profile
+                            </a>
+                            <a href="referral.html" class="dropdown-item">
+                                <span>🎯</span> Referral
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item" onclick="logout(); return false;">
+                                <span>🚪</span> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Hero Section -->
+                <div class="referral-hero">
+                    <h1>🎁 Refer & Earn</h1>
+                    <p>Share your referral link and grow together!</p>
+                </div>
+
+                <!-- Referral Code Box -->
+                <div class="referral-code-box">
+                    <div class="referral-code-label">Your Referral Code</div>
+                    <div class="referral-code" id="referralCode">LOADING...</div>
+                    <button class="copy-button" onclick="copyReferralCode()">
+                        📋 Copy Code
+                    </button>
+                </div>
+
+                <!-- Referral Link -->
+                <div class="referral-link-box">
+                    <div class="referral-link" id="referralLink">
+                        Loading referral link...
+                    </div>
+                    <button class="copy-button" style="padding: 12px 30px;" onclick="copyReferralLink()">
+                        📋 Copy Link
+                    </button>
+                </div>
+
+                <!-- Share Buttons -->
+                <h3 style="margin-bottom: 15px; font-size: 1.3em;">Share Your Link</h3>
+                <div class="share-buttons">
+                    <button class="share-btn twitter" onclick="shareOnTwitter()">
+                        <span>🐦</span> Twitter
+                    </button>
+                    <button class="share-btn telegram" onclick="shareOnTelegram()">
+                        <span>✈️</span> Telegram
+                    </button>
+                    <button class="share-btn whatsapp" onclick="shareOnWhatsApp()">
+                        <span>💬</span> WhatsApp
+                    </button>
+                    <button class="share-btn facebook" onclick="shareOnFacebook()">
+                        <span>📘</span> Facebook
+                    </button>
+                </div>
+
+                <!-- Referral Stats -->
+                <h2 style="margin: 40px 0 20px; font-size: 1.8em;">Your Referral Stats</h2>
+                <div class="referral-stats-grid">
+                    <div class="referral-stat-card">
+                        <div class="stat-icon-large">👥</div>
+                        <div class="stat-number-large" id="totalReferrals">0</div>
+                        <div class="stat-label-large">Total Referrals</div>
+                    </div>
+
+                    <div class="referral-stat-card">
+                        <div class="stat-icon-large">✅</div>
+                        <div class="stat-number-large" id="activeReferrals">0</div>
+                        <div class="stat-label-large">Active Users</div>
+                    </div>
+
+                    <div class="referral-stat-card">
+                        <div class="stat-icon-large">💰</div>
+                        <div class="stat-number-large" id="totalEarnings">$0</div>
+                        <div class="stat-label-large">Total Earnings</div>
+                    </div>
+
+                    <div class="referral-stat-card">
+                        <div class="stat-icon-large">🔥</div>
+                        <div class="stat-number-large" id="thisMonth">0</div>
+                        <div class="stat-label-large">This Month</div>
+                    </div>
+                </div>
+
+                <!-- How It Works -->
+                <div class="how-it-works">
+                    <h2>🎯 How It Works</h2>
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h3>Share Your Link</h3>
+                                <p>Copy your unique referral link and share it with friends, family, or on social media.</p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h3>They Sign Up</h3>
+                                <p>When someone clicks your link and creates an account, they become your referral.</p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h3>You Both Earn</h3>
+                                <p>Get rewards for every successful referral. The more you share, the more you earn!</p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h3>Track Your Progress</h3>
+                                <p>Monitor your referrals, earnings, and growth right from this dashboard.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="dashboard.js"></script>
+    <script>
+        let referralCode = '';
+        let referralLink = '';
+
+        // Copy Referral Code
+        function copyReferralCode() {
+            copyToClipboard(referralCode);
+        }
+
+        // Copy Referral Link
+        function copyReferralLink() {
+            copyToClipboard(referralLink);
+        }
+
+        // Share on Twitter
+        function shareOnTwitter() {
+            const text = `Join me on FXC Bot Looters and automate your account creation! 🚀 Use my referral code: ${referralCode}`;
+            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(referralLink)}`;
+            window.open(url, '_blank');
+        }
+
+        // Share on Telegram
+        function shareOnTelegram() {
+            const text = `Join me on FXC Bot Looters! 🚀 Use my referral link: ${referralLink}`;
+            const url = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
+        // Share on WhatsApp
+        function shareOnWhatsApp() {
+            const text = `Join me on FXC Bot Looters and automate your account creation! 🚀 Use my referral code: ${referralCode}\n\n${referralLink}`;
+            const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
+        // Share on Facebook
+        function shareOnFacebook() {
+            const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(referralLink)}`;
+            window.open(url, '_blank');
+        }
+
+        // Load Referral Data
+        async function loadReferralData() {
+            try {
+                const data = await apiCall('/dashboard/referral');
+                
+                if (data && data.success) {
+                    // Set referral code and link
+                    referralCode = data.referral.referral_code;
+                    referralLink = data.referral.referral_link;
+                    
+                    document.getElementById('referralCode').textContent = referralCode;
+                    document.getElementById('referralLink').textContent = referralLink;
+                    
+                    // Update stats
+                    document.getElementById('totalReferrals').textContent = formatNumber(data.referral.total_referrals || 0);
+                    document.getElementById('activeReferrals').textContent = formatNumber(data.referral.active_referrals || 0);
+                    document.getElementById('totalEarnings').textContent = '$' + formatNumber(data.referral.total_earnings || 0);
+                    document.getElementById('thisMonth').textContent = formatNumber(data.referral.this_month || 0);
+                }
+            } catch (error) {
+                console.error('Error loading referral data:', error);
+                // Set default values
+                const user = getCurrentUser();
+                referralCode = user.referral_code || 'ABC12345';
+                referralLink = `${window.location.origin}/signup.html?ref=${referralCode}`;
+                
+                document.getElementById('referralCode').textContent = referralCode;
+                document.getElementById('referralLink').textContent = referralLink;
+            }
+        }
+
+        // Initialize page
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Check authentication and initialize
+            const user = await initDashboard('nav-referral');
+            
+            if (user) {
+                // Load referral data
+                loadReferralData();
+            }
+        });
+    </script>
+</body>
+</html>
