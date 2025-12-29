@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - FXC Bot Looters</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <!-- Auth Loading Screen -->
+    <div class="auth-loading">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Dashboard Container (hidden until auth confirmed) -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">🚀 FXC Bot Looters</div>
+            </div>
+
+            <nav class="nav-menu">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="dashboard.html" class="nav-item active" id="nav-dashboard">
+                        <span class="nav-icon">🏠</span>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="accounts.html" class="nav-item" id="nav-accounts">
+                        <span class="nav-icon">📋</span>
+                        <span>My Accounts</span>
+                    </a>
+                    <a href="referral.html" class="nav-item" id="nav-referral">
+                        <span class="nav-icon">🎯</span>
+                        <span>Referral</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Bots</div>
+                    <a href="defi.html" class="nav-item" id="nav-defi">
+                        <span class="nav-icon">💎</span>
+                        <span>DeFi Products</span>
+                    </a>
+                    <a href="darino.html" class="nav-item" id="nav-darino">
+                        <span class="nav-icon">🎯</span>
+                        <span>Darino</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="profile.html" class="nav-item" id="nav-profile">
+                        <span class="nav-icon">👤</span>
+                        <span>Profile</span>
+                    </a>
+                    <a href="#" class="nav-item" onclick="logout(); return false;">
+                        <span class="nav-icon">🚪</span>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="top-bar-left">
+                    <div class="mobile-menu-toggle" onclick="toggleSidebar()">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div>
+                        <h1>Dashboard</h1>
+                        <div class="breadcrumb">Home / Dashboard</div>
+                    </div>
+                </div>
+
+                <div class="top-bar-right">
+                    <div class="user-profile" onclick="toggleUserDropdown()">
+                        <div class="user-avatar" id="userAvatar">U</div>
+                        <div class="user-info">
+                            <div class="user-name" id="userName">User</div>
+                            <div class="user-role">Member</div>
+                        </div>
+                        
+                        <!-- Dropdown Menu -->
+                        <div class="dropdown-menu" id="userDropdown">
+                            <a href="profile.html" class="dropdown-item">
+                                <span>👤</span> Profile
+                            </a>
+                            <a href="referral.html" class="dropdown-item">
+                                <span>🎯</span> Referral
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item" onclick="logout(); return false;">
+                                <span>🚪</span> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Welcome Section -->
+                <div class="card" style="margin-bottom: 30px; background: linear-gradient(135deg, rgba(255,59,59,0.1) 0%, rgba(99,102,241,0.1) 100%);">
+                    <h2 style="font-size: 1.8em; margin-bottom: 10px;">
+                        Welcome back, <span id="welcomeName">User</span>! 👋
+                    </h2>
+                    <p style="color: var(--gray); font-size: 1.1em;">
+                        Ready to create some accounts? Let's get started!
+                    </p>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <h3 id="totalAccounts">0</h3>
+                            <p>Total Accounts</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon success">✅</div>
+                        <div class="stat-content">
+                            <h3 id="successAccounts">0</h3>
+                            <p>Successful</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon warning">🤖</div>
+                        <div class="stat-content">
+                            <h3 id="botsUsed">0</h3>
+                            <p>Bots Used</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon secondary">📈</div>
+                        <div class="stat-content">
+                            <h3 id="successRate">0%</h3>
+                            <p>Success Rate</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="search-bar">
+                    <span class="search-icon">🔍</span>
+                    <input 
+                        type="text" 
+                        id="searchBots" 
+                        placeholder="Search for bots..."
+                        onkeyup="searchBots()"
+                    >
+                </div>
+
+                <!-- Available Bots Section -->
+                <h2 style="margin-bottom: 20px; font-size: 1.6em;">Available Bots</h2>
+                <div class="bot-grid" id="botGrid">
+                    <!-- Bots will be loaded here -->
+                </div>
+
+                <!-- Latest Updates Section -->
+                <h2 style="margin: 40px 0 20px; font-size: 1.6em;">Latest Updates</h2>
+                <div class="card" id="updatesSection">
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <div style="padding: 15px; background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10B981; border-radius: 10px;">
+                            <h4 style="margin-bottom: 5px;">🎉 New Bot Added!</h4>
+                            <p style="color: var(--gray); font-size: 0.9em;">Darino bot is now available for account creation.</p>
+                            <small style="color: var(--gray-light); font-size: 0.8em;">2 days ago</small>
+                        </div>
+
+                        <div style="padding: 15px; background: rgba(99, 102, 241, 0.1); border-left: 4px solid #6366f1; border-radius: 10px;">
+                            <h4 style="margin-bottom: 5px;">🚀 System Update</h4>
+                            <p style="color: var(--gray); font-size: 0.9em;">Improved account creation speed by 50%!</p>
+                            <small style="color: var(--gray-light); font-size: 0.8em;">5 days ago</small>
+                        </div>
+
+                        <div style="padding: 15px; background: rgba(255, 59, 59, 0.1); border-left: 4px solid #FF3B3B; border-radius: 10px;">
+                            <h4 style="margin-bottom: 5px;">💡 Pro Tip</h4>
+                            <p style="color: var(--gray); font-size: 0.9em;">Use your referral code to earn rewards when others sign up!</p>
+                            <small style="color: var(--gray-light); font-size: 0.8em;">1 week ago</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="dashboard.js"></script>
+    <script>
+        // Available bots data
+        const botsData = [
+            {
+                id: 'defi',
+                name: 'DeFi Products',
+                icon: '💎',
+                description: 'Investment platform with automated account creation',
+                tag: 'Finance',
+                url: 'defi.html'
+            },
+            {
+                id: 'darino',
+                name: 'Darino',
+                icon: '🎯',
+                description: 'Task-based platform for earning and growth',
+                tag: 'Tasks',
+                url: 'darino.html'
+            },
+            {
+                id: 'coming-soon',
+                name: 'More Coming Soon',
+                icon: '🚀',
+                description: 'New platforms being added weekly',
+                tag: 'Soon',
+                url: '#'
+            }
+        ];
+
+        // Render bots
+        function renderBots(bots) {
+            const botGrid = document.getElementById('botGrid');
+            botGrid.innerHTML = bots.map(bot => `
+                <a href="${bot.url}" class="bot-card">
+                    <div class="bot-logo">${bot.icon}</div>
+                    <h3>${bot.name}</h3>
+                    <p>${bot.description}</p>
+                    <span class="bot-tag">${bot.tag}</span>
+                </a>
+            `).join('');
+        }
+
+        // Search bots
+        function searchBots() {
+            const searchTerm = document.getElementById('searchBots').value.toLowerCase();
+            const filteredBots = botsData.filter(bot => 
+                bot.name.toLowerCase().includes(searchTerm) ||
+                bot.description.toLowerCase().includes(searchTerm) ||
+                bot.tag.toLowerCase().includes(searchTerm)
+            );
+            renderBots(filteredBots);
+        }
+
+        // Load stats
+        async function loadStats() {
+            try {
+                const stats = await apiCall('/dashboard/stats');
+                
+                if (stats && stats.success) {
+                    document.getElementById('totalAccounts').textContent = formatNumber(stats.stats.total_accounts || 0);
+                    document.getElementById('successAccounts').textContent = formatNumber(stats.stats.success_accounts || 0);
+                    
+                    const botsUsed = Object.keys(stats.stats.accounts_by_bot || {}).length;
+                    document.getElementById('botsUsed').textContent = botsUsed;
+                    
+                    const rate = stats.stats.total_accounts > 0 
+                        ? Math.round((stats.stats.success_accounts / stats.stats.total_accounts) * 100)
+                        : 0;
+                    document.getElementById('successRate').textContent = rate + '%';
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Initialize page
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Check authentication and initialize
+            const user = await initDashboard('nav-dashboard');
+            
+            if (user) {
+                // Update welcome name
+                const welcomeName = document.getElementById('welcomeName');
+                if (welcomeName && user.email) {
+                    welcomeName.textContent = user.email.split('@')[0];
+                }
+                
+                // Load bots
+                renderBots(botsData);
+                
+                // Load stats
+                loadStats();
+            }
+        });
+    </script>
+</body>
+</html>
