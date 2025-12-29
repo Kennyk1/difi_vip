@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeFi Products Bot - FXC Bot Looters</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        /* Additional styles for bot page */
+        .bot-header {
+            background: linear-gradient(135deg, rgba(255,59,59,0.1) 0%, rgba(99,102,241,0.1) 100%);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .bot-icon-large {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary) 0%, #FF6B6B 100%);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5em;
+            flex-shrink: 0;
+            box-shadow: 0 10px 30px rgba(255,59,59,0.3);
+        }
+
+        .bot-info h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        .bot-info p {
+            color: var(--gray);
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+
+        .bot-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .bot-info-tag {
+            padding: 6px 16px;
+            background: rgba(255,59,59,0.2);
+            border-radius: 20px;
+            font-size: 0.85em;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .create-section {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .create-section h2 {
+            font-size: 1.6em;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #E2E8F0;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .required {
+            color: var(--primary);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 0 0 4px rgba(255,59,59,0.1);
+        }
+
+        .info-text {
+            font-size: 0.85em;
+            color: var(--gray);
+            margin-top: 8px;
+        }
+
+        .info-box {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+            font-size: 0.9em;
+            color: var(--gray-light);
+        }
+
+        .info-box-icon {
+            font-size: 1.5em;
+            flex-shrink: 0;
+        }
+
+        .progress-section {
+            margin: 25px 0;
+            display: none;
+        }
+
+        .progress-section.show {
+            display: block;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 40px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, #FF6B6B 100%);
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.95em;
+        }
+
+        .progress-info {
+            text-align: center;
+            color: var(--gray-light);
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        .btn-create {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary) 0%, #FF6B6B 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(255,59,59,0.3);
+        }
+
+        .btn-create:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(255,59,59,0.4);
+        }
+
+        .btn-create:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .accounts-section {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .accounts-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .accounts-header h2 {
+            font-size: 1.6em;
+        }
+
+        .btn-download {
+            padding: 12px 24px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-download:hover:not(:disabled) {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .btn-download:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .accounts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .accounts-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .accounts-list::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+
+        .accounts-list::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .account-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .account-card:hover {
+            background: rgba(255,255,255,0.05);
+            transform: translateX(5px);
+        }
+
+        .account-card.failed {
+            border-left: 4px solid #DC2626;
+            background: rgba(220, 38, 38, 0.05);
+        }
+
+        .account-card.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .account-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .account-number {
+            font-weight: 700;
+            font-size: 1.1em;
+            color: var(--primary);
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-badge.success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-badge.failed {
+            background: rgba(220, 38, 38, 0.2);
+            color: #DC2626;
+        }
+
+        .account-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .detail-label {
+            font-size: 0.85em;
+            color: var(--gray);
+            font-weight: 600;
+        }
+
+        .detail-value {
+            font-size: 0.95em;
+            color: white;
+            word-break: break-all;
+        }
+
+        .btn-copy-small {
+            padding: 8px 16px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 5px;
+        }
+
+        .btn-copy-small:hover {
+            background: #059669;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        .empty-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10B981;
+        }
+
+        .alert.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #EF4444;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .bot-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .account-details {
+                grid-template-columns: 1fr;
+            }
+
+            .accounts-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+
+            .btn-download {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Loading Screen -->
+    <div class="auth-loading">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">🚀 FXC Bot Looters</div>
+            </div>
+
+            <nav class="nav-menu">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="dashboard.html" class="nav-item" id="nav-dashboard">
+                        <span class="nav-icon">🏠</span>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="accounts.html" class="nav-item" id="nav-accounts">
+                        <span class="nav-icon">📋</span>
+                        <span>My Accounts</span>
+                    </a>
+                    <a href="referral.html" class="nav-item" id="nav-referral">
+                        <span class="nav-icon">🎯</span>
+                        <span>Referral</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Bots</div>
+                    <a href="defi.html" class="nav-item active" id="nav-defi">
+                        <span class="nav-icon">💎</span>
+                        <span>DeFi Products</span>
+                    </a>
+                    <a href="darino.html" class="nav-item" id="nav-darino">
+                        <span class="nav-icon">🎯</span>
+                        <span>Darino</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="profile.html" class="nav-item" id="nav-profile">
+                        <span class="nav-icon">👤</span>
+                        <span>Profile</span>
+                    </a>
+                    <a href="#" class="nav-item" onclick="logout(); return false;">
+                        <span class="nav-icon">🚪</span>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="top-bar-left">
+                    <div class="mobile-menu-toggle" onclick="toggleSidebar()">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div>
+                        <h1>DeFi Products Bot</h1>
+                        <div class="breadcrumb">Home / Bots / DeFi Products</div>
+                    </div>
+                </div>
+
+                <div class="top-bar-right">
+                    <div class="user-profile" onclick="toggleUserDropdown()">
+                        <div class="user-avatar" id="userAvatar">U</div>
+                        <div class="user-info">
+                            <div class="user-name" id="userName">User</div>
+                            <div class="user-role">Member</div>
+                        </div>
+                        
+                        <div class="dropdown-menu" id="userDropdown">
+                            <a href="profile.html" class="dropdown-item">
+                                <span>👤</span> Profile
+                            </a>
+                            <a href="referral.html" class="dropdown-item">
+                                <span>🎯</span> Referral
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item" onclick="logout(); return false;">
+                                <span>🚪</span> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Bot Header -->
+                <div class="bot-header">
+                    <div class="bot-icon-large">💎</div>
+                    <div class="bot-info">
+                        <h1>DeFi Products</h1>
+                        <p>Automated account creation for DeFi Products investment platform</p>
+                        <div class="bot-tags">
+                            <span class="bot-info-tag">Finance</span>
+                            <span class="bot-info-tag">Investment</span>
+                            <span class="bot-info-tag">Requires Promo Code</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Create Accounts Section -->
+                <div class="create-section">
+                    <h2>🚀 Create Accounts</h2>
+
+                    <div class="alert" id="createAlert"></div>
+
+                    <div class="info-box">
+                        <div class="info-box-icon">💡</div>
+                        <div>
+                            <strong>Important:</strong> You need a 6-digit promo code (referral code) to create DeFi Products accounts. 
+                            Get your promo code from your DeFi Products account or use someone's referral code.
+                        </div>
+                    </div>
+
+                    <form id="createForm">
+                        <div class="form-group">
+                            <label>Promo Code (Referral) <span class="required">*</span></label>
+                            <input 
+                                type="text" 
+                                id="promoCode" 
+                                placeholder="Enter 6-digit promo code" 
+                                maxlength="6"
+                                required
+                            >
+                            <p class="info-text">Example: 791580</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Number of Accounts <span class="required">*</span></label>
+                            <input 
+                                type="number" 
+                                id="accountCount" 
+                                min="1" 
+                                max="50" 
+                                value="1"
+                                required
+                            >
+                            <p class="info-text">Maximum: 50 accounts per batch</p>
+                        </div>
+
+                        <div class="progress-section" id="progressSection">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill" id="progressFill">0%</div>
+                            </div>
+                            <p class="progress-info" id="progressInfo">Preparing to create accounts...</p>
+                        </div>
+
+                        <button type="submit" class="btn-create" id="createBtn">
+                            🔥 Start Creating Accounts
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Created Accounts Section -->
+                <div class="accounts-section">
+                    <div class="accounts-header">
+                        <h2>📋 Your DeFi Accounts</h2>
+                        <button class="btn-download" id="downloadBtn" onclick="downloadAccounts()" disabled>
+                            📥 Download All
+                        </button>
+                    </div>
+
+                    <div class="accounts-list" id="accountsList">
+                        <div class="empty-state">
+                            <div class="empty-icon">💎</div>
+                            <h3>No Accounts Yet</h3>
+                            <p>Create your first DeFi Products accounts above!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="dashboard.js"></script>
+    <script>
+        let createdAccounts = [];
+
+        // Show Alert
+        function showAlert(message, type) {
+            const alert = document.getElementById('createAlert');
+            alert.textContent = message;
+            alert.className = `alert ${type} show`;
+            
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 5000);
+        }
+
+        // Update Progress
+        function updateProgress(current, total, message) {
+            const percent = Math.round((current / total) * 100);
+            const progressFill = document.getElementById('progressFill');
+            const progressInfo = document.getElementById('progressInfo');
+            const progressSection = document.getElementById('progressSection');
+            
+            progressSection.classList.add('show');
+            progressFill.style.width = percent + '%';
+            progressFill.textContent = `${percent}%`;
+            progressInfo.innerHTML = message;
+        }
+
+        // Display Accounts
+        function displayAccounts(accounts) {
+            const accountsList = document.getElementById('accountsList');
+            const downloadBtn = document.getElementById('downloadBtn');
+            
+            if (!accounts || accounts.length === 0) {
+                accountsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">💎</div>
+                        <h3>No Accounts Yet</h3>
+                        <p>Create your first DeFi Products accounts above!</p>
+                    </div>
+                `;
+                downloadBtn.disabled = true;
+                return;
+            }
+
+            downloadBtn.disabled = false;
+            
+            accountsList.innerHTML = accounts.map((acc, index) => `
+                <div class="account-card ${acc.status}">
+                    <div class="account-card-header">
+                        <span class="account-number">Account #${index + 1}</span>
+                        <span class="status-badge ${acc.status}">${acc.status}</span>
+                    </div>
+                    <div class="account-details">
+                        <div class="detail-item">
+                            <span class="detail-label">📧 Email</span>
+                            <span class="detail-value">${acc.email}</span>
+                            <button class="btn-copy-small" onclick="copyToClipboard('${acc.email}')">Copy</button>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">🔑 Password</span>
+                            <span class="detail-value">${acc.password}</span>
+                            <button class="btn-copy-small" onclick="copyToClipboard('${acc.password}')">Copy</button>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">🎫 Promo Code</span>
+                            <span class="detail-value">${acc.promo_code}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">📅 Created</span>
+                            <span class="detail-value">${new Date(acc.created_at).toLocaleString()}</span>
+                        </div>
+                        ${acc.error ? `
+                        <div class="detail-item" style="grid-column: 1 / -1;">
+                            <span class="detail-label">❌ Error</span>
+                            <span class="detail-value" style="color: #DC2626;">${acc.error}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Download Accounts
+        function downloadAccounts() {
+            if (createdAccounts.length === 0) return;
+            
+            let content = '='.repeat(70) + '\n';
+            content += 'DEFI PRODUCTS ACCOUNTS\n';
+            content += '='.repeat(70) + '\n';
+            content += `Generated: ${new Date().toLocaleString()}\n`;
+            content += `Total Accounts: ${createdAccounts.length}\n`;
+            content += '='.repeat(70) + '\n\n';
+            
+            createdAccounts.forEach((acc, idx) => {
+                content += `Account #${idx + 1}:\n`;
+                content += `  Email:    ${acc.email}\n`;
+                content += `  Password: ${acc.password}\n`;
+                content += `  Promo:    ${acc.promo_code}\n`;
+                content += `  Status:   ${acc.status}\n`;
+                content += `  Created:  ${new Date(acc.created_at).toLocaleString()}\n`;
+                content += `  Login:    https://defiproducts.vip\n`;
+                content += `  Format:   ${acc.email}:${acc.password}\n`;
+                if (acc.error) {
+                    content += `  Error:    ${acc.error}\n`;
+                }
+                content += '-'.repeat(70) + '\n';
+            });
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `defi_accounts_${Date.now()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            showToast('Accounts downloaded successfully!', 'success');
+        }
+
+        // Handle Form Submit
+        document.getElementById('createForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const promoCode = document.getElementById('promoCode').value.trim();
+            const accountCount = parseInt(document.getElementById('accountCount').value);
+            const createBtn = document.getElementById('createBtn');
+            
+            // Validate
+            if (!promoCode || promoCode.length !== 6 || !/^\d+$/.test(promoCode)) {
+                showAlert('Promo code must be exactly 6 digits!', 'error');
+                return;
+            }
+            
+            if (accountCount < 1 || accountCount > 50) {
+                showAlert('Account count must be between 1 and 50!', 'error');
+                return;
+            }
+            
+            // Disable button
+            createBtn.disabled = true;
+            createBtn.textContent = '⏳ Creating...';
+            updateProgress(0, accountCount, 'Starting account creation...');
+            
+            try {
+                // Call API
+                const response = await apiCall('/bot/defi/create', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        promo_code: promoCode,
+                        count: accountCount
+                    })
+                });
+                
+                if (response && response.success) {
+                    createdAccounts = [...response.accounts, ...createdAccounts];
+                    
+                    updateProgress(accountCount, accountCount, 
+                        `✓ Created ${response.created} accounts successfully!`);
+                    
+                    displayAccounts(createdAccounts);
+                    
+                    showAlert(
+                        `🎉 Successfully created ${response.created} out of ${accountCount} accounts!`,
+                        'success'
+                    );
+                    
+                    // Reset form
+                    document.getElementById('createForm').reset();
+                    
+                } else {
+                    throw new Error(response?.error || 'Failed to create accounts');
+                }
+                
+            } catch (error) {
+                console.error('Create accounts error:', error);
+                showAlert(`Error: ${error.message}`, 'error');
+                updateProgress(0, accountCount, '❌ Failed to create accounts');
+            } finally {
+                createBtn.disabled = false;
+                createBtn.textContent = '🔥 Start Creating Accounts';
+                
+                setTimeout(() => {
+                    document.getElementById('progressSection').classList.remove('show');
+                }, 3000);
+            }
+        });
+
+        // Load Existing Accounts
+        async function loadExistingAccounts() {
+            try {
+                const response = await apiCall('/bot/defi/accounts');
+                
+                if (response && response.success && response.accounts) {
+                    createdAccounts = response.accounts;
+                    displayAccounts(createdAccounts);
+                }
+            } catch (error) {
+                console.error('Error loading accounts:', error);
+            }
+        }
+
+        // Initialize page
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Check authentication and initialize
+            const user = await initDashboard('nav-defi');
+            
+            if (user) {
+                // Load existing accounts
+                loadExistingAccounts();
+            }
+        });
+    </script>
+</body>
+</html>
