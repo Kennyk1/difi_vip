@@ -1,5 +1,5 @@
 // bind.js - Phone Binding Management
-// Integrates with Flask backend API
+// Updated to support new Darino backend endpoints
 
 let currentBindAccount = null;
 let bindCheckInterval = null;
@@ -17,29 +17,22 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 // ==================== EVENT LISTENERS ====================
 function setupEventListeners() {
-    // WhatsApp App Number Save
     document.getElementById('btnSaveWhatsApp').addEventListener('click', saveWhatsAppAppNumber);
     
-    // Modal controls
     document.getElementById('btnCloseModal').addEventListener('click', closeBindModal);
     document.getElementById('btnRequestCode').addEventListener('click', requestBindCode);
     document.getElementById('btnCheckStatus').addEventListener('click', checkBindStatus);
     document.getElementById('btnDone').addEventListener('click', closeBindModal);
     
-    // Close modal on outside click
     document.getElementById('bindModal').addEventListener('click', (e) => {
-        if (e.target.id === 'bindModal') {
-            closeBindModal();
-        }
+        if (e.target.id === 'bindModal') closeBindModal();
     });
 }
 
 // ==================== WHATSAPP APP NUMBER ====================
 function loadWhatsAppAppNumber() {
     const saved = localStorage.getItem('whatsapp_app_number');
-    if (saved) {
-        document.getElementById('whatsappAppNumber').value = saved;
-    }
+    if (saved) document.getElementById('whatsappAppNumber').value = saved;
 }
 
 function saveWhatsAppAppNumber() {
@@ -57,7 +50,7 @@ async function loadDarinoAccounts() {
     try {
         const response = await apiCall('/bot/darino/accounts');
         
-        if (response && response.success && response.accounts && response.accounts.length > 0) {
+        if (response?.success && response.accounts?.length > 0) {
             displayBindAccounts(response.accounts);
         } else {
             document.getElementById('bindAccountsList').innerHTML = `
@@ -110,24 +103,12 @@ function displayBindAccounts(accounts) {
                     </div>
                 </div>
                 <div class="bind-actions">
-                    ${status === 'not_bound' ? `
-                        <button class="btn-bind" onclick='openBindModal(${JSON.stringify(acc).replace(/'/g, "&apos;")})'>
-                            📱 Bind Phone
-                        </button>
-                    ` : ''}
+                    ${status === 'not_bound' ? `<button class="btn-bind" onclick='openBindModal(${JSON.stringify(acc).replace(/'/g, "&apos;")})'>📱 Bind Phone</button>` : ''}
                     ${status === 'bound' ? `
-                        <button class="btn-check" onclick='recheckBinding(${JSON.stringify(acc).replace(/'/g, "&apos;")})'>
-                            🔍 Check Status
-                        </button>
-                        <button class="btn-rebind" onclick='openBindModal(${JSON.stringify(acc).replace(/'/g, "&apos;")})'>
-                            🔄 Rebind
-                        </button>
+                        <button class="btn-check" onclick='recheckBinding(${JSON.stringify(acc).replace(/'/g, "&apos;")})'>🔍 Check Status</button>
+                        <button class="btn-rebind" onclick='openBindModal(${JSON.stringify(acc).replace(/'/g, "&apos;")})'>🔄 Rebind</button>
                     ` : ''}
-                    ${status === 'checking' ? `
-                        <button class="btn-check" disabled>
-                            ⏳ Checking...
-                        </button>
-                    ` : ''}
+                    ${status === 'checking' ? `<button class="btn-check" disabled>⏳ Checking...</button>` : ''}
                 </div>
             </div>
         `;
@@ -146,34 +127,20 @@ function openBindModal(account) {
 function closeBindModal() {
     document.getElementById('bindModal').classList.remove('show');
     currentBindAccount = null;
-    if (bindCheckInterval) {
-        clearInterval(bindCheckInterval);
-    }
-    loadDarinoAccounts(); // Refresh list
+    if (bindCheckInterval) clearInterval(bindCheckInterval);
+    loadDarinoAccounts();
 }
 
 function resetBindModal() {
-    // Show step 1
-    document.getElementById('step1').classList.add('active');
-    document.getElementById('step2').classList.remove('active');
-    document.getElementById('step3').classList.remove('active');
-    
-    // Reset step indicators
-    document.getElementById('stepDot1').classList.add('active');
-    document.getElementById('stepDot2').classList.remove('active');
-    document.getElementById('stepDot3').classList.remove('active');
-    
-    // Clear inputs
+    goToStep(1);
     document.getElementById('bindPhoneNumber').value = '';
     document.getElementById('verificationCode').textContent = '------';
 }
 
 function goToStep(stepNum) {
-    // Hide all steps
     document.querySelectorAll('.bind-step').forEach(step => step.classList.remove('active'));
     document.querySelectorAll('.step-dot').forEach(dot => dot.classList.remove('active'));
     
-    // Show target step
     document.getElementById(`step${stepNum}`).classList.add('active');
     document.getElementById(`stepDot${stepNum}`).classList.add('active');
 }
@@ -187,7 +154,6 @@ async function requestBindCode() {
         return;
     }
     
-    // Basic validation
     if (!phone.startsWith('+')) {
         showToast('Phone number must start with + and country code', 'error');
         return;
@@ -206,15 +172,10 @@ async function requestBindCode() {
             })
         });
         
-        if (response && response.success) {
-            // Display verification code (if returned from API)
-            const code = response.code || '------';
-            document.getElementById('verificationCode').textContent = code;
-            
-            // Move to step 2
+        if (response?.success) {
+            currentBindAccount.uuid = response.uuid;
             goToStep(2);
-            
-            showToast('Verification code requested!', 'success');
+            showToast('Verification code requested! Enter WhatsApp pairing.', 'success');
         } else {
             throw new Error(response?.error || 'Failed to request bind code');
         }
@@ -222,46 +183,39 @@ async function requestBindCode() {
     } catch (error) {
         console.error('Error requesting code:', error);
         showToast(error.message || 'Failed to request code', 'error');
+    } finally {
         btnRequestCode.disabled = false;
         btnRequestCode.textContent = '📞 Request Code';
     }
 }
 
 async function checkBindStatus() {
+    if (!currentBindAccount?.uuid) {
+        showToast('Binding not started', 'error');
+        return;
+    }
+
     const btnCheckStatus = document.getElementById('btnCheckStatus');
     btnCheckStatus.disabled = true;
     btnCheckStatus.textContent = '⏳ Checking...';
-    
+
     try {
-        // Poll the backend to check if binding completed
-        const response = await apiCall(`/bot/darino/accounts`);
-        
-        if (response && response.success) {
-            const account = response.accounts.find(a => a.id === currentBindAccount.id);
-            
-            if (account && account.status === 'bound') {
-                // Success!
-                goToStep(3);
-                showToast('Binding successful!', 'success');
-                
-                // Start background check after 30 minutes
-                setTimeout(() => {
-                    recheckBinding(account);
-                }, 30 * 60 * 1000);
-                
-            } else {
-                // Not yet bound
-                showToast('Binding not complete yet. Please complete WhatsApp pairing.', 'warning');
-                btnCheckStatus.disabled = false;
-                btnCheckStatus.textContent = '🔍 Check Bind Status';
-            }
+        const response = await apiCall('/bot/darino/bind/status', {
+            method: 'POST',
+            body: JSON.stringify({ account_id: currentBindAccount.id })
+        });
+
+        if (response?.success) {
+            goToStep(3);
+            showToast('Binding successful!', 'success');
+            loadDarinoAccounts();
         } else {
-            throw new Error('Failed to check status');
+            showToast('Binding not complete yet. Complete WhatsApp pairing.', 'warning');
         }
-        
     } catch (error) {
         console.error('Error checking status:', error);
-        showToast(error.message || 'Failed to verify binding', 'error');
+        showToast('Failed to verify binding', 'error');
+    } finally {
         btnCheckStatus.disabled = false;
         btnCheckStatus.textContent = '🔍 Check Bind Status';
     }
@@ -269,7 +223,6 @@ async function checkBindStatus() {
 
 // ==================== RECHECK BINDING ====================
 async function recheckBinding(account) {
-    // Update UI to show checking
     const card = document.querySelector(`[data-account-id="${account.id}"]`);
     if (card) {
         const badge = card.querySelector('.bind-status-badge');
@@ -278,29 +231,17 @@ async function recheckBinding(account) {
     }
     
     try {
-        // Refresh accounts from backend
         const response = await apiCall('/bot/darino/accounts');
-        
-        if (response && response.success) {
+        if (response?.success) {
             const updatedAccount = response.accounts.find(a => a.id === account.id);
-            
             if (updatedAccount) {
-                if (updatedAccount.status === 'bound') {
-                    showToast('Still bound!', 'success');
-                } else {
-                    showToast('Binding expired - please rebind', 'warning');
-                }
-                
-                // Refresh display
+                showToast(updatedAccount.status === 'bound' ? 'Still bound!' : 'Binding expired - please rebind', updatedAccount.status === 'bound' ? 'success' : 'warning');
                 displayBindAccounts(response.accounts);
             }
         }
-        
     } catch (error) {
         console.error('Error rechecking:', error);
         showToast('Check failed', 'error');
-        
-        // Refresh display anyway
         loadDarinoAccounts();
     }
 }
