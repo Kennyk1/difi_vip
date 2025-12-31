@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phone Binding - FXC Bot Looters</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        /* Bind page specific styles */
+        .bind-header-section {
+            background: linear-gradient(135deg, rgba(255,59,59,0.1) 0%, rgba(99,102,241,0.1) 100%);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .bind-header-section h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .bind-header-section p {
+            color: var(--gray);
+            font-size: 1.1em;
+        }
+
+        .whatsapp-app-section {
+            background: rgba(37, 211, 102, 0.1);
+            border: 1px solid rgba(37, 211, 102, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .whatsapp-app-section h3 {
+            color: #25D366;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .whatsapp-input-group {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .whatsapp-input-group input {
+            flex: 1;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1em;
+        }
+
+        .whatsapp-input-group input:focus {
+            outline: none;
+            border-color: #25D366;
+        }
+
+        .btn-save-whatsapp {
+            padding: 14px 30px;
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-save-whatsapp:hover {
+            background: #128C7E;
+            transform: translateY(-2px);
+        }
+
+        .accounts-with-bind {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .bind-account-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+        .bind-account-card:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .bind-account-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .bind-status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .bind-status-badge.bound {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .bind-status-badge.unbound {
+            background: rgba(239, 68, 68, 0.2);
+            color: #EF4444;
+        }
+
+        .bind-status-badge.checking {
+            background: rgba(245, 158, 11, 0.2);
+            color: #F59E0B;
+        }
+
+        .bind-account-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .bind-detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .bind-detail-label {
+            font-size: 0.85em;
+            color: var(--gray);
+            font-weight: 600;
+        }
+
+        .bind-detail-value {
+            font-size: 0.95em;
+            color: white;
+        }
+
+        .bind-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-bind {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-bind:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-rebind {
+            padding: 10px 20px;
+            background: #F59E0B;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-rebind:hover {
+            background: #D97706;
+            transform: translateY(-2px);
+        }
+
+        .btn-check {
+            padding: 10px 20px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-check:hover {
+            background: #5558d9;
+            transform: translateY(-2px);
+        }
+
+        /* Modal Styles */
+        .bind-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .bind-modal.show {
+            display: flex;
+        }
+
+        .bind-modal-content {
+            background: var(--dark-light);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .bind-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .bind-modal-header h2 {
+            font-size: 1.8em;
+            color: white;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 2em;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: white;
+        }
+
+        .bind-step {
+            display: none;
+        }
+
+        .bind-step.active {
+            display: block;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .step-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            transition: all 0.3s;
+        }
+
+        .step-dot.active {
+            background: var(--primary);
+            width: 30px;
+            border-radius: 6px;
+        }
+
+        .bind-form-group {
+            margin-bottom: 25px;
+        }
+
+        .bind-form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #E2E8F0;
+            font-weight: 600;
+        }
+
+        .bind-form-group input {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1em;
+        }
+
+        .bind-form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .bind-info-box {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        .verification-code-display {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--success);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .verification-code-display .code {
+            font-size: 2.5em;
+            font-weight: 800;
+            color: var(--success);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 5px;
+        }
+
+        .btn-modal-primary {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, #FF6B6B 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn-modal-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255,59,59,0.4);
+        }
+
+        .btn-modal-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .bind-account-details {
+                grid-template-columns: 1fr;
+            }
+
+            .bind-actions {
+                flex-direction: column;
+            }
+
+            .whatsapp-input-group {
+                flex-direction: column;
+            }
+
+            .btn-save-whatsapp {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Loading Screen -->
+    <div class="auth-loading">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">🚀 FXC Bot Looters</div>
+            </div>
+
+            <nav class="nav-menu">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="dashboard.html" class="nav-item" id="nav-dashboard">
+                        <span class="nav-icon">🏠</span>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="accounts.html" class="nav-item" id="nav-accounts">
+                        <span class="nav-icon">📋</span>
+                        <span>My Accounts</span>
+                    </a>
+                    <a href="referral.html" class="nav-item" id="nav-referral">
+                        <span class="nav-icon">🎯</span>
+                        <span>Referral</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Bots</div>
+                    <a href="defi.html" class="nav-item" id="nav-defi">
+                        <span class="nav-icon">💎</span>
+                        <span>DeFi Products</span>
+                    </a>
+                    <a href="darino.html" class="nav-item" id="nav-darino">
+                        <span class="nav-icon">🎯</span>
+                        <span>Darino</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Tools</div>
+                    <a href="bind.html" class="nav-item active" id="nav-bind">
+                        <span class="nav-icon">📱</span>
+                        <span>Phone Binding</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="profile.html" class="nav-item" id="nav-profile">
+                        <span class="nav-icon">👤</span>
+                        <span>Profile</span>
+                    </a>
+                    <a href="#" class="nav-item" onclick="logout(); return false;">
+                        <span class="nav-icon">🚪</span>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="top-bar-left">
+                    <div class="mobile-menu-toggle" onclick="toggleSidebar()">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div>
+                        <h1>Phone Binding</h1>
+                        <div class="breadcrumb">Home / Phone Binding</div>
+                    </div>
+                </div>
+
+                <div class="top-bar-right">
+                    <div class="user-profile" onclick="toggleUserDropdown()">
+                        <div class="user-avatar" id="userAvatar">U</div>
+                        <div class="user-info">
+                            <div class="user-name" id="userName">User</div>
+                            <div class="user-role">Member</div>
+                        </div>
+                        
+                        <div class="dropdown-menu" id="userDropdown">
+                            <a href="profile.html" class="dropdown-item">
+                                <span>👤</span> Profile
+                            </a>
+                            <a href="referral.html" class="dropdown-item">
+                                <span>🎯</span> Referral
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item" onclick="logout(); return false;">
+                                <span>🚪</span> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Header Section -->
+                <div class="bind-header-section">
+                    <h1>📱 Phone Binding Management</h1>
+                    <p>Bind WhatsApp numbers to your Darino accounts</p>
+                </div>
+
+                <!-- WhatsApp App Number Section -->
+                <div class="whatsapp-app-section">
+                    <h3>💬 WhatsApp App Number (Clone Reference)</h3>
+                    <p style="color: var(--gray); margin-bottom: 15px; font-size: 0.9em;">
+                        Save your WhatsApp app number for reference (used for cloning). This is stored locally.
+                    </p>
+                    <div class="whatsapp-input-group">
+                        <input 
+                            type="text" 
+                            id="whatsappAppNumber" 
+                            placeholder="Enter WhatsApp app number (e.g., +2348012345678)"
+                        >
+                        <button class="btn-save-whatsapp" onclick="saveWhatsAppAppNumber()">
+                            💾 Save Number
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Accounts with Binding -->
+                <div class="accounts-with-bind">
+                    <h2 style="margin-bottom: 25px;">📋 Your Darino Accounts</h2>
+                    <div id="bindAccountsList">
+                        <div style="text-align: center; padding: 60px 20px; color: var(--gray);">
+                            <div style="font-size: 4em; margin-bottom: 20px;">📱</div>
+                            <h3>Loading accounts...</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bind Modal -->
+    <div class="bind-modal" id="bindModal">
+        <div class="bind-modal-content">
+            <div class="bind-modal-header">
+                <h2>📱 Bind Phone Number</h2>
+                <button class="modal-close" onclick="closeBindModal()">×</button>
+            </div>
+
+            <div class="step-indicator">
+                <div class="step-dot active" id="stepDot1"></div>
+                <div class="step-dot" id="stepDot2"></div>
+                <div class="step-dot" id="stepDot3"></div>
+            </div>
+
+            <!-- Step 1: Enter Phone Number -->
+            <div class="bind-step active" id="step1">
+                <div class="bind-info-box">
+                    💡 Enter your WhatsApp number to bind it to this account
+                </div>
+
+                <div class="bind-form-group">
+                    <label>WhatsApp Number</label>
+                    <input 
+                        type="text" 
+                        id="bindPhoneNumber" 
+                        placeholder="+2348012345678"
+                    >
+                    <p style="font-size: 0.85em; color: var(--gray); margin-top: 8px;">
+                        Include country code (e.g., +234 for Nigeria)
+                    </p>
+                </div>
+
+                <button class="btn-modal-primary" onclick="requestBindCode()">
+                    📞 Request Code
+                </button>
+            </div>
+
+            <!-- Step 2: Verification Code -->
+            <div class="bind-step" id="step2">
+                <div class="bind-info-box">
+                    ✅ Code requested successfully! Enter this code in your WhatsApp.
+                </div>
+
+                <div class="verification-code-display">
+                    <p style="color: var(--gray); margin-bottom: 10px;">Verification Code:</p>
+                    <div class="code" id="verificationCode">------</div>
+                </div>
+
+                <div class="bind-info-box">
+                    📱 <strong>Steps:</strong><br>
+                    1. Open WhatsApp on your phone<br>
+                    2. Go to Settings → Linked Devices<br>
+                    3. Enter the code above<br>
+                    4. Click "Check Status" below when done
+                </div>
+
+                <button class="btn-modal-primary" onclick="checkBindStatus()">
+                    🔍 Check Bind Status
+                </button>
+            </div>
+
+            <!-- Step 3: Success -->
+            <div class="bind-step" id="step3">
+                <div style="text-align: center; padding: 40px 20px;">
+                    <div style="font-size: 5em; margin-bottom: 20px;">✅</div>
+                    <h2 style="color: var(--success); margin-bottom: 15px;">Binding Successful!</h2>
+                    <p style="color: var(--gray);">
+                        Your WhatsApp number has been successfully bound to this account.
+                    </p>
+                </div>
+
+                <button class="btn-modal-primary" onclick="closeBindModal()">
+                    🎉 Done
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+    <script>
+        let currentBindAccount = null;
+        let bindCheckInterval = null;
+
+        // Load WhatsApp App Number
+        function loadWhatsAppAppNumber() {
+            const saved = localStorage.getItem('whatsapp_app_number');
+            if (saved) {
+                document.getElementById('whatsappAppNumber').value = saved;
+            }
+        }
+
+        // Save WhatsApp App Number
+        function saveWhatsAppAppNumber() {
+            const number = document.getElementById('whatsappAppNumber').value.trim();
+            if (number) {
+                localStorage.setItem('whatsapp_app_number', number);
+                showToast('WhatsApp app number saved!', 'success');
+            } else {
+                showToast('Please enter a number', 'error');
+            }
+        }
+
+        // Load Darino Accounts
+        async function loadDarinoAccounts() {
+            try {
+                const response = await apiCall('/bot/darino/accounts');
+                
+                if (response && response.success && response.accounts && response.accounts.length > 0) {
+                    displayBindAccounts(response.accounts);
+                } else {
+                    document.getElementById('bindAccountsList').innerHTML = `
+                        <div style="text-align: center; padding: 60px 20px; color: var(--gray);">
+                            <div style="font-size: 4em; margin-bottom: 20px;">📭</div>
+                            <h3>No Darino Accounts Found</h3>
+                            <p>Create accounts in the Darino bot page first</p>
+                            <a href="darino.html" style="display: inline-block; margin-top: 20px; padding: 12px 24px; background: var(--primary); color: white; text-decoration: none; border-radius: 10px;">
+                                Go to Darino Bot
+                            </a>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading accounts:', error);
+                document.getElementById('bindAccountsList').innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px; color: var(--gray);">
+                        <h3>Error loading accounts</h3>
+                    </div>
+                `;
+            }
+        }
+
+        // Display Bind Accounts
+        function displayBindAccounts(accounts) {
+            const bindStatus = JSON.parse(localStorage.getItem('bind_status') || '{}');
+            
+            const html = accounts.map((acc, index) => {
+                const status = bindStatus[acc.email] || 'unbound';
+                const boundPhone = localStorage.getItem(`bound_phone_${acc.email}`) || 'Not bound';
+                
+                return `
+                    <div class="bind-account-card">
+                        <div class="bind-account-header">
+                            <span style="font-weight: 700; color: white;">${acc.email}</span>
+                            <span class="bind-status-badge ${status}">${status.toUpperCase()}</span>
+                        </div>
+                        <div class="bind-account-details">
+                            <div class="bind-detail-item">
+                                <span class="bind-detail-label">📧 Email</span>
+                                <span class="bind-detail-value">${acc.email}</span>
+                            </div>
+                            <div class="bind-detail-item">
+                                <span class="bind-detail-label">🔑 Password</span>
+                                <span class="bind-detail-value">${acc.password}</span>
+                            </div>
+                            <div class="bind-detail-item">
+                                <span class="bind-detail-label">📱 Bound Phone</span>
+                                <span class="bind-detail-value">${boundPhone}</span>
+                            </div>
+                        </div>
+                        <div class="bind-actions">
+                            ${status === 'unbound' ? `
+                                <button class="btn-bind" onclick='openBindModal(${JSON.stringify(acc)})'>
+                                    📱 Bind Phone
+                                </button>
+                            ` : ''}
+                            ${status === 'bound' ? `
+                                <button class="btn-check" onclick='recheckBinding(${JSON.stringify(acc)})'>
+                                    🔍 Check Status
+                                </button>
+                                <button class="btn-rebind" onclick='openBindModal(${JSON.stringify(acc)})'>
+                                    🔄 Rebind
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('bindAccountsList').innerHTML = html;
+        }
+
+        // Open Bind Modal
+        function openBindModal(account) {
+            currentBindAccount = account;
+            document.getElementById('bindModal').classList.add('show');
+            resetBindModal();
+        }
+
+        // Close Bind Modal
+        function closeBindModal() {
+            document.getElementById('bindModal').classList.remove('show');
+            currentBindAccount = null;
+            if (bindCheckInterval) {
+                clearInterval(bindCheckInterval);
+            }
+            loadDarinoAccounts(); // Refresh list
+        }
+
+        // Reset Bind Modal
+        function resetBindModal() {
+            document.getElementById('step1').classList.add('active');
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step3').classList.remove('active');
+            document.getElementById('stepDot1').classList.add('active');
+            document.getElementById('stepDot2').classList.remove('active');
+            document.getElementById('stepDot3').classList.remove('active');
+            document.getElementById('bindPhoneNumber').value = '';
+            document.getElementById('verificationCode').textContent = '------';
+        }
+
+        // Request Bind Code
+        async function requestBindCode() {
+            const phone = document.getElementById('bindPhoneNumber').value.trim();
+            
+            if (!phone) {
+                showToast('Please enter a phone number', 'error');
+                return;
+            }
+
+            try {
+                // TODO: Call your bind API
+                // const response = await apiCall('/bot/darino/request-code', {
+                //     method: 'POST',
+                //     body: JSON.stringify({
+                //         email: currentBindAccount.email,
+                //         password: currentBindAccount.password,
+                //         phone: phone
+                //     })
+                // });
+
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                const code = '777777'; // Mock code
+                
+                document.getElementById('verificationCode').textContent = code;
+                
+                // Save phone number
+                localStorage.setItem(`bound_phone_${currentBindAccount.email}`, phone);
+                
+                // Move to step 2
+                document.getElementById('step1').classList.remove('active');
+                document.getElementById('step2').classList.add('active');
+                document.getElementById('stepDot1').classList.remove('active');
+                document.getElementById('stepDot2').classList.add('active');
+                
+                showToast('Verification code generated!', 'success');
+                
+            } catch (error) {
+                console.error('Error requesting code:', error);
+                showToast('Failed to request code', 'error');
+            }
+        }
+
+        // Check Bind Status
+        async function checkBindStatus() {
+            try {
+                // TODO: Call your scan_result API
+                // const response = await apiCall('/bot/darino/check-binding', {
+                //     method: 'POST',
+                //     body: JSON.stringify({
+                //         email: currentBindAccount.email,
+                //         password: currentBindAccount.password
+                //     })
+                // });
+
+                // Simulate success
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Update bind status
+                const bindStatus = JSON.parse(localStorage.getItem('bind_status') || '{}');
+                bindStatus[currentBindAccount.email] = 'bound';
+                localStorage.setItem('bind_status', JSON.stringify(bindStatus));
+                
+                // Move to step 3
+                document.getElementById('step2').classList.remove('active');
+                document.getElementById('step3').classList.add('active');
+                document.getElementById('stepDot2').classList.remove('active');
+                document.getElementById('stepDot3').classList.add('active');
+                
+                // Start background check (30 mins)
+                startBackgroundCheck(currentBindAccount.email);
+                
+            } catch (error) {
+                console.error('Error checking status:', error);
+                showToast('Failed to verify binding', 'error');
+            }
+        }
+
+        // Recheck Binding
+        async function recheckBinding(account) {
+            try {
+                const bindStatus = JSON.parse(localStorage.getItem('bind_status') || '{}');
+                bindStatus[account.email] = 'checking';
+                localStorage.setItem('bind_status', JSON.stringify(bindStatus));
+                loadDarinoAccounts();
+                
+                // TODO: Call scan_result API
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Simulate result
+                const stillBound = Math.random() > 0.3; // 70% chance still bound
+                
+                if (stillBound) {
+                    bindStatus[account.email] = 'bound';
+                    showToast('Still bound!', 'success');
+                } else {
+                    bindStatus[account.email] = 'unbound';
+                    showToast('Binding expired - please rebind', 'error');
+                }
+                
+                localStorage.setItem('bind_status', JSON.stringify(bindStatus));
+                loadDarinoAccounts();
+                
+            } catch (error) {
+                console.error('Error rechecking:', error);
+                showToast('Check failed', 'error');
+            }
+        }
+
+        // Start Background Check (30 mins)
+        function startBackgroundCheck(email) {
+            setTimeout(() => {
+                recheckBinding({ email });
+            }, 30 * 60 * 1000); // 30 minutes
+        }
+
+        // Initialize page
+        window.addEventListener('DOMContentLoaded', async () => {
+            const user = await initDashboard('nav-bind');
+            
+            if (user) {
+                loadWhatsAppAppNumber();
+                loadD
