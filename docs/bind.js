@@ -1,5 +1,5 @@
 // bind.js - Phone Binding Management
-// Fully updated to force verification code 777777
+// Fully updated to handle UUID passing and status verification
 
 let currentBindAccount = null;
 let bindCheckInterval = null;
@@ -145,7 +145,7 @@ function goToStep(stepNum) {
     document.getElementById(`stepDot${stepNum}`).classList.add('active');
 }
 
-// ==================== BIND PROCESS (Force 777777) ====================
+// ==================== BIND PROCESS ====================
 async function requestBindCode() {
     const phone = document.getElementById('bindPhoneNumber').value.trim();
 
@@ -173,13 +173,14 @@ async function requestBindCode() {
         });
 
         if (response?.success) {
+            // Store the UUID returned by the backend for the next step
             currentBindAccount.uuid = response.uuid;
 
-            // ✅ Force verification code to 777777
+            // ✅ Force verification code display to 777777
             document.getElementById('verificationCode').textContent = '777777';
 
             goToStep(2);
-            showToast('Verification code requested! Enter 777777 in WhatsApp pairing.', 'success');
+            showToast('Code requested! Enter 777777 in WhatsApp.', 'success');
         } else {
             throw new Error(response?.error || 'Failed to request bind code');
         }
@@ -194,22 +195,35 @@ async function requestBindCode() {
 
 async function checkBindStatus() {
     if (!currentBindAccount?.uuid) {
-        showToast('Binding not started', 'error');
+        showToast('Binding session not found. Please restart.', 'error');
         return;
     }
 
     const btnCheckStatus = document.getElementById('btnCheckStatus');
     btnCheckStatus.disabled = true;
-    btnCheckStatus.textContent = '⏳ Checking...';
+    btnCheckStatus.textContent = '⏳ Verifying...';
 
     try {
-        // ✅ Always succeed
-        goToStep(3);
-        showToast('Binding successful!', 'success');
-        loadDarinoAccounts();
+        // ACTUALLY check with the backend
+        const response = await apiCall('/bot/darino/bind/status', {
+            method: 'POST',
+            body: JSON.stringify({
+                account_id: currentBindAccount.id,
+                uuid: currentBindAccount.uuid
+            })
+        });
+
+        if (response?.success) {
+            goToStep(3);
+            showToast('Binding successful!', 'success');
+            loadDarinoAccounts(); // Reload to show the 'BOUND' badge
+        } else {
+            // Show the actual error message from Darino (like "Waiting for scan")
+            showToast(response.message || 'Not yet confirmed in WhatsApp', 'warning');
+        }
     } catch (error) {
         console.error('Error checking status:', error);
-        showToast('Failed to verify binding', 'error');
+        showToast('Verification failed', 'error');
     } finally {
         btnCheckStatus.disabled = false;
         btnCheckStatus.textContent = '🔍 Check Bind Status';
@@ -230,7 +244,7 @@ async function recheckBinding(account) {
         if (response?.success) {
             const updatedAccount = response.accounts.find(a => a.id === account.id);
             if (updatedAccount) {
-                showToast(updatedAccount.status === 'bound' ? 'Still bound!' : 'Binding expired - please rebind', updatedAccount.status === 'bound' ? 'success' : 'warning');
+                showToast(updatedAccount.status === 'bound' ? 'Still bound!' : 'Binding expired', updatedAccount.status === 'bound' ? 'success' : 'warning');
                 displayBindAccounts(response.accounts);
             }
         }
