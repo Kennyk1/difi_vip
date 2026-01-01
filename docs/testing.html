@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Connection Manager - FXC Bot Looters</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        /* === STABLE MOBILE-FIRST STYLES === */
+        :root {
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --accent-primary: #6366f1;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+        }
+
+        .bind-header-section {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        .bind-header-section h1 { font-size: 1.8rem; margin-bottom: 8px; }
+        .bind-header-section p { color: #94a3b8; font-size: 0.95rem; }
+
+        /* Stable Grid System */
+        .accounts-with-bind {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            min-height: 450px; /* Prevents layout shifting */
+        }
+
+        #bindAccountsList {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            margin-top: 10px;
+        }
+
+        .bind-account-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease;
+        }
+
+        .bind-account-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .email-display { font-weight: 700; color: #f1f5f9; font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* Status Badges */
+        .bind-status-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        .bind-status-badge.bound { background: rgba(16, 185, 129, 0.2); color: var(--accent-success); }
+        .bind-status-badge.not_bound { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+        .bind-account-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .detail-box { display: flex; flex-direction: column; }
+        .detail-label { font-size: 0.7rem; color: #64748b; text-transform: uppercase; margin-bottom: 2px; }
+        .detail-value { font-size: 0.85rem; color: #cbd5e1; font-weight: 500; }
+
+        /* Full Width Actions on Mobile */
+        .bind-actions { display: flex; gap: 8px; margin-top: auto; }
+        .bind-actions button { flex: 1; padding: 10px; font-size: 0.8rem; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; transition: 0.3s; }
+        
+        .btn-bind { background: var(--accent-primary); color: white; }
+        .btn-rebind { background: var(--accent-warning); color: white; }
+        .btn-check { background: rgba(255,255,255,0.1); color: white; }
+
+        /* RESPONSIVE OVERRIDES */
+        @media (max-width: 600px) {
+            #bindAccountsList { grid-template-columns: 1fr; }
+            .bind-header-section { padding: 15px; text-align: center; }
+            .bind-actions { flex-direction: column; }
+        }
+
+        /* Modal Fixes */
+        .bind-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; padding: 15px; }
+        .bind-modal.show { display: flex; }
+        .bind-modal-content { background: #0f172a; width: 100%; max-width: 400px; border-radius: 20px; padding: 30px; border: 1px solid var(--accent-primary); }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <main class="main-content">
+            <div class="content-area">
+                <div class="bind-header-section">
+                    <h1>📱 Connection Manager</h1>
+                    <p>Link and verify your WhatsApp sessions for automated looting.</p>
+                </div>
+
+                <div class="accounts-with-bind">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h2 style="font-size:1.1rem;">Active Sessions</h2>
+                        <button class="btn-check" onclick="loadDarinoAccounts()" style="font-size:0.75rem;">🔄 Refresh</button>
+                    </div>
+                    <div id="bindAccountsList">
+                        <div style="text-align:center; width:100%; padding:50px 0; color:#64748b;">Loading accounts...</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="bind-modal" id="bindModal">
+        <div class="bind-modal-content">
+            <h2 id="modalTitle" style="margin-bottom:15px;">Bind WhatsApp</h2>
+            <div id="step1" class="bind-step active">
+                <input type="text" id="bindPhoneNumber" placeholder="+234..." style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; background:rgba(255,255,255,0.05); color:white; border:1px solid #334155;">
+                <button class="btn-bind" id="btnRequestCode" style="width:100%" onclick="requestBindCode()">Request Pairing Code</button>
+            </div>
+            <div id="step2" class="bind-step" style="display:none; text-align:center;">
+                <p style="font-size:0.8rem; color:#94a3b8;">Enter this code in Linked Devices:</p>
+                <div id="verificationCode" style="font-size:2rem; font-weight:800; color:var(--accent-success); margin:15px 0;">77777777</div>
+                <button class="btn-bind" id="btnCheckStatus" style="width:100%" onclick="checkBindStatus()">Verify Connection</button>
+            </div>
+            <div id="step3" class="bind-step" style="display:none; text-align:center;">
+                <div style="font-size:3rem; margin-bottom:10px;">✅</div>
+                <h3>Linked Successfully!</h3>
+                <button class="btn-check" style="width:100%; margin-top:15px;" onclick="closeBindModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentBindAccount = null;
+
+        window.onload = () => {
+            // Assuming initDashboard exists in your dashboard.js
+            loadDarinoAccounts();
+        };
+
+        async function loadDarinoAccounts() {
+            try {
+                const response = await apiCall('/bot/darino/accounts');
+                if (response?.success) {
+                    displayBindAccounts(response.accounts);
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        function displayBindAccounts(accounts) {
+            const list = document.getElementById('bindAccountsList');
+            if (!accounts.length) {
+                list.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px;">No accounts found.</div>`;
+                return;
+            }
+
+            list.innerHTML = accounts.map(acc => {
+                const status = acc.status || 'not_bound';
+                // Pulling number from the new metadata structure we created
+                const phone = (acc.metadata && acc.metadata.last_phone) ? acc.metadata.last_phone : 'None';
+                
+                return `
+                <div class="bind-account-card">
+                    <div class="bind-account-header">
+                        <div class="email-display">${acc.email}</div>
+                        <span class="bind-status-badge ${status}">${status.replace('_',' ')}</span>
+                    </div>
+                    <div class="bind-account-details">
+                        <div class="detail-box">
+                            <span class="detail-label">Linked Number</span>
+                            <span class="detail-value">${phone}</span>
+                        </div>
+                        <div class="detail-box">
+                            <span class="detail-label">Bot Type</span>
+                            <span class="detail-value">Darino</span>
+                        </div>
+                    </div>
+                    <div class="bind-actions">
+                        ${status === 'not_bound' ? 
+                            `<button class="btn-bind" onclick='openBindModal(${JSON.stringify(acc)})'>📱 Bind</button>` :
+                            `<button class="btn-check" onclick='recheck(${acc.id})'>🔍 Check</button>
+                             <button class="btn-rebind" onclick='openBindModal(${JSON.stringify(acc)})'>🔄 Rebind</button>`
+                        }
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function openBindModal(acc) {
+            currentBindAccount = acc;
+            document.getElementById('bindModal').classList.add('show');
+            document.getElementById('step1').style.display = 'block';
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('step3').style.display = 'none';
+        }
+
+        function closeBindModal() {
+            document.getElementById('bindModal').classList.remove('show');
+            loadDarinoAccounts();
+        }
+
+        async function requestBindCode() {
+            const phone = document.getElementById('bindPhoneNumber').value;
+            const btn = document.getElementById('btnRequestCode');
+            btn.disabled = true; btn.innerText = "Requesting...";
+
+            const res = await apiCall('/bot/darino/bind', {
+                method: 'POST',
+                body: JSON.stringify({ account_id: currentBindAccount.id, phone })
+            });
+
+            if (res?.success) {
+                currentBindAccount.uuid = res.uuid;
+                document.getElementById('step1').style.display = 'none';
+                document.getElementById('step2').style.display = 'block';
+            } else {
+                alert(res.error || "Failed to get code");
+            }
+            btn.disabled = false; btn.innerText = "Request Pairing Code";
+        }
+
+        async function checkBindStatus() {
+            const res = await apiCall('/bot/darino/bind/status', {
+                method: 'POST',
+                body: JSON.stringify({ account_id: currentBindAccount.id, uuid: currentBindAccount.uuid })
+            });
+
+            if (res?.success) {
+                document.getElementById('step2').style.display = 'none';
+                document.getElementById('step3').style.display = 'block';
+            } else {
+                alert(res.message || "Still waiting for WhatsApp...");
+            }
+        }
+    </script>
+</body>
+</html>
