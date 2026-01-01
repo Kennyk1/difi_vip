@@ -177,10 +177,10 @@ async function requestBindCode() {
             currentBindAccount.uuid = response.uuid;
 
             // ✅ Force verification code display to 777777
-            document.getElementById('verificationCode').textContent = '777777';
+            document.getElementById('verificationCode').textContent = '77777777';
 
             goToStep(2);
-            showToast('Code requested! Enter 777777 in WhatsApp.', 'success');
+            showToast('Code requested! Enter 77777777 in WhatsApp.', 'success');
         } else {
             throw new Error(response?.error || 'Failed to request bind code');
         }
