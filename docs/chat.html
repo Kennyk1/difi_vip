@@ -1,60 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Chat</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Tailwind CDN (for testing, later build properly) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            neon: '#22d3ee',
-            neon2: '#a855f7',
-            glass: 'rgba(255,255,255,0.05)'
-          }
-        }
-      }
-    }
-  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="chat.css">
 </head>
 
-<body class="bg-gradient-to-br from-black via-slate-900 to-black text-white h-screen">
+<body>
 
-<!-- APP WRAPPER -->
-<div class="max-w-md md:max-w-3xl mx-auto h-full flex flex-col">
+<div class="app">
 
-  <!-- TOP BAR -->
-  <div class="flex items-center gap-3 px-4 py-3 border-b border-white/10 backdrop-blur-md">
-    <div id="myAvatar" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg"></div>
-    <div class="flex-1">
-      <div id="myUsername" class="font-semibold text-sm">@username</div>
-      <div class="text-xs text-gray-400">online</div>
+  <!-- HEADER -->
+  <div class="header">
+    <div class="avatar" id="myAvatar"></div>
+    <div class="me">
+      <div id="myUsername">@user</div>
+      <small>online</small>
     </div>
-    <button class="text-neon text-xl">⚙️</button>
   </div>
 
   <!-- SEARCH -->
-  <div class="p-3">
-    <input
-      id="searchInput"
-      type="text"
-      placeholder="Search @username"
-      class="w-full bg-glass border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-neon transition"
-    />
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search @username">
   </div>
 
   <!-- CHAT LIST -->
-  <div id="chatList" class="flex-1 overflow-y-auto px-2 space-y-2 pb-4">
-    <!-- chats injected here -->
+  <div class="chat-list" id="chatList">
+    <!-- users appear here -->
   </div>
 
 </div>
 
-<script src="js/chat.js"></script>
+<script src="chat.js"></script>
 </body>
 </html>
