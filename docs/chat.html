@@ -281,34 +281,38 @@
       });
     }
 
-    // Verify user auth on load
     async function verifyUser() {
-      if (!token) {
-        statusMsg.textContent = "Not logged in. Redirecting to login...";
-        setTimeout(() => window.location.href = "login.html", 2000);
-        return false;
-      }
-      try {
-        const res = await fetch(`${API_BASE}/auth/verify`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (!res.ok) throw new Error("Verification failed");
-        const data = await res.json();
-        if (data.success) {
-          statusMsg.style.display = 'none';
-          searchInput.disabled = false;
-          return true;
-        } else {
-          statusMsg.textContent = "Unauthorized. Redirecting to login...";
-          setTimeout(() => window.location.href = "login.html", 2000);
-          return false;
-        }
-      } catch (e) {
-        statusMsg.textContent = "Error verifying user. Please try again.";
-        console.error(e);
-        return false;
-      }
+  if (!token) {
+    statusMsg.textContent = "Not logged in. Redirecting to login...";
+    setTimeout(() => window.location.href = "login.html", 2000);
+    return false;
+  }
+  try {
+    const res = await fetch(`${API_BASE}/auth/verify`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ token })
+    });
+    if (!res.ok) throw new Error("Verification failed");
+    const data = await res.json();
+    if (data.success && data.valid) {
+      statusMsg.style.display = 'none';
+      searchInput.disabled = false;
+      return true;
+    } else {
+      statusMsg.textContent = "Unauthorized. Redirecting to login...";
+      setTimeout(() => window.location.href = "login.html", 2000);
+      return false;
     }
+  } catch (e) {
+    statusMsg.textContent = "Error verifying user. Please try again.";
+    console.error(e);
+    return false;
+  }
+    }
+    
 
     // Fetch recent chats: get distinct users you chatted with and last message info
     async function fetchRecentChats() {
