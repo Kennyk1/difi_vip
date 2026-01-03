@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>User Profile</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #121229;
+      color: #E0E7FF;
+      padding: 20px;
+      max-width: 400px;
+      margin: auto;
+      text-align: center;
+    }
+    h1 {
+      color: #FF3B3B;
+      margin-bottom: 20px;
+    }
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #444a7a;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+      color: #E0E7FF;
+      margin-bottom: 15px;
+      overflow: hidden;
+      box-shadow: 0 0 8px #FF3B3B;
+    }
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .username {
+      font-size: 1.8em;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .bio {
+      font-size: 1em;
+      color: #A5B4FC;
+      white-space: pre-wrap;
+      min-height: 60px;
+    }
+    #statusMsg {
+      margin-top: 30px;
+      font-weight: 600;
+      color: #FF3B3B;
+    }
+    /* Spinner */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255,255,255,0.1);
+      border-top-color: #FF3B3B;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>User Profile</h1>
+
+  <div class="avatar" id="avatarContainer"></div>
+  <div class="username" id="username"></div>
+  <div class="bio" id="bio"></div>
+
+  <div id="statusMsg"></div>
+
+  <script>
+    const API_BASE = "https://sample-api-1-ryj7.onrender.com";
+    const token = localStorage.getItem("token");
+
+    const avatarContainer = document.getElementById("avatarContainer");
+    const usernameDiv = document.getElementById("username");
+    const bioDiv = document.getElementById("bio");
+    const statusMsg = document.getElementById("statusMsg");
+
+    // Show spinner and message
+    function showLoading(message = "Loading...") {
+      statusMsg.innerHTML = `
+        <div class="spinner"></div>
+        <p>${message}</p>
+      `;
+      statusMsg.style.color = "#A5B4FC";
+    }
+
+    function hideLoading() {
+      statusMsg.innerHTML = "";
+    }
+
+    // Get userId from URL query param (?userId=...)
+    function getUserIdFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("userId");
+    }
+
+    // Render avatar or placeholder letter
+    function renderAvatar(url, username) {
+      avatarContainer.innerHTML = "";
+      if (url) {
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = username;
+        img.onerror = () => {
+          // Fallback to placeholder if image fails
+          avatarContainer.textContent = username.charAt(0).toUpperCase();
+        };
+        avatarContainer.appendChild(img);
+      } else {
+        avatarContainer.textContent = username.charAt(0).toUpperCase();
+      }
+    }
+
+    // Verify token with backend
+    async function verifyToken() {
+      if (!token) {
+        statusMsg.textContent = "Not logged in. Redirecting to login...";
+        setTimeout(() => window.location.href = "login.html", 2000);
+        return false;
+      }
+      showLoading("Verifying authentication...");
+      try {
+        const res = await fetch(`${API_BASE}/auth/verify`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token })
+        });
+        const data = await res.json();
+        if (data.success && data.valid) {
+          hideLoading();
+          return true;
+        } else {
+          statusMsg.textContent = "Unauthorized. Redirecting to login...";
+          setTimeout(() => window.location.href = "login.html", 2000);
+          return false;
+        }
+      } catch (e) {
+        statusMsg.textContent = "Error verifying user. Please try again.";
+        console.error(e);
+        return false;
+      }
+    }
+
+    // Fetch user profile data from API
+    async function fetchUserProfile(userId) {
+      showLoading("Loading user profile...");
+      try {
+        const res = await fetch(`${API_BASE}/userprofile/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("Failed to load user profile");
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || "Failed to load user profile");
+
+        hideLoading();
+        const user = data.user;
+        const username = user.username || user.email.split("@")[0];
+        renderAvatar(user.avatar_url, username);
+        usernameDiv.textContent = username;
+        bioDiv.textContent = user.bio || "This user hasn't added a bio yet.";
+
+      } catch (e) {
+        statusMsg.textContent = "Failed to load user profile.";
+        console.error(e);
+      }
+    }
+
+    // Main
+    (async () => {
+      const userId = getUserIdFromUrl();
+      if (!userId) {
+        statusMsg.textContent = "No user specified.";
+        return;
+      }
+      const verified = await verifyToken();
+      if (!verified) return;
+      await fetchUserProfile(userId);
+    })();
+  </script>
+</body>
+</html>
