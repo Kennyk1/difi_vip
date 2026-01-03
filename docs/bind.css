@@ -1,27 +1,35 @@
-/* Bind page specific styles */
+/* Bind page specific styles - Inspired by screenshot with neon glow and dark theme */
+
 .bind-header-section {
-    background: linear-gradient(135deg, rgba(255,59,59,0.1) 0%, rgba(99,102,241,0.1) 100%);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(255, 59, 59, 0.15) 100%);
     border-radius: 20px;
-    padding: 40px;
-    margin-bottom: 30px;
-    border: 1px solid rgba(255,255,255,0.1);
+    padding: 30px 20px;
+    margin-bottom: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
 }
 
 .bind-header-section h1 {
-    font-size: 2.5em;
-    margin-bottom: 10px;
+    font-size: 2em;
+    margin-bottom: 8px;
+    color: #A78BFA; /* soft purple */
+    font-weight: 700;
+    text-shadow: 0 0 8px #A78BFA;
 }
 
 .bind-header-section p {
-    color: var(--gray);
+    color: #D1D5DB; /* lighter gray */
     font-size: 1.1em;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
+/* WhatsApp section (if used) */
 .whatsapp-app-section {
-    background: rgba(37, 211, 102, 0.1);
-    border: 1px solid rgba(37, 211, 102, 0.3);
+    background: rgba(37, 211, 102, 0.12);
+    border: 1px solid rgba(37, 211, 102, 0.4);
     border-radius: 20px;
-    padding: 25px;
+    padding: 20px 15px;
     margin-bottom: 30px;
 }
 
@@ -31,22 +39,27 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    font-weight: 700;
+    text-shadow: 0 0 5px #25D366;
 }
 
 .whatsapp-input-group {
     display: flex;
-    gap: 15px;
-    align-items: end;
+    gap: 12px;
+    align-items: flex-end;
+    flex-wrap: wrap;
 }
 
 .whatsapp-input-group input {
     flex: 1;
+    min-width: 220px;
     padding: 14px 18px;
-    background: rgba(255,255,255,0.05);
-    border: 2px solid rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.12);
     border-radius: 12px;
     color: white;
     font-size: 1em;
+    transition: border-color 0.3s ease;
 }
 
 .whatsapp-input-group input:focus {
@@ -60,14 +73,16 @@
     color: white;
     border: none;
     border-radius: 12px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
+    min-width: 120px;
 }
 
 .btn-save-whatsapp:hover {
     background: #128C7E;
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: 0 0 15px #25D366;
 }
 
 .btn-save-whatsapp:disabled {
@@ -75,99 +90,137 @@
     cursor: not-allowed;
 }
 
+/* Bound accounts container */
 .accounts-with-bind {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(30, 30, 50, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 20px;
-    padding: 30px;
+    padding: 25px 15px;
+    max-width: 100%;
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
 }
 
+/* Individual bind account card */
 .bind-account-card {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: linear-gradient(145deg, rgba(99, 102, 241, 0.15), rgba(255, 59, 59, 0.15));
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 15px;
     padding: 20px;
-    margin-bottom: 15px;
-    transition: all 0.3s;
+    margin-bottom: 18px;
+    color: white;
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+    transition: all 0.4s ease;
 }
 
 .bind-account-card:hover {
-    background: rgba(255,255,255,0.05);
+    background: linear-gradient(145deg, rgba(99, 102, 241, 0.3), rgba(255, 59, 59, 0.3));
+    box-shadow: 0 0 25px rgba(255, 59, 59, 0.8);
+    transform: translateY(-3px);
 }
 
+/* Header of each account card */
 .bind-account-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
+    font-weight: 700;
+    font-size: 1.1em;
 }
 
+/* Status badge with neon glow */
 .bind-status-badge {
-    padding: 8px 16px;
+    padding: 8px 18px;
     border-radius: 20px;
     font-size: 0.85em;
     font-weight: 700;
     text-transform: uppercase;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
 }
 
 .bind-status-badge.bound {
-    background: rgba(16, 185, 129, 0.2);
-    color: var(--success);
+    background: rgba(16, 185, 129, 0.3);
+    color: #10B981;
+    box-shadow: 0 0 12px #10B981;
 }
 
 .bind-status-badge.not_bound {
-    background: rgba(239, 68, 68, 0.2);
+    background: rgba(239, 68, 68, 0.3);
     color: #EF4444;
+    box-shadow: 0 0 12px #EF4444;
 }
 
 .bind-status-badge.checking {
-    background: rgba(245, 158, 11, 0.2);
+    background: rgba(245, 158, 11, 0.3);
     color: #F59E0B;
+    box-shadow: 0 0 12px #F59E0B;
 }
 
+/* Account details grid */
 .bind-account-details {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 18px;
     margin-bottom: 15px;
+    font-weight: 500;
+    font-size: 0.95em;
 }
 
+/* Individual detail item */
 .bind-detail-item {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 6px;
 }
 
 .bind-detail-label {
     font-size: 0.85em;
-    color: var(--gray);
+    color: #A5B4FC; /* soft neon blue */
     font-weight: 600;
+    text-shadow: 0 0 4px #A5B4FC;
 }
 
 .bind-detail-value {
-    font-size: 0.95em;
+    font-size: 1em;
     color: white;
+    word-break: break-word;
 }
 
+/* Actions buttons container */
 .bind-actions {
     display: flex;
-    gap: 10px;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
-.btn-bind {
-    padding: 10px 20px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-weight: 600;
+/* Common button style */
+.btn-bind,
+.btn-rebind,
+.btn-check {
+    padding: 12px 22px;
+    border-radius: 12px;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s;
+    border: none;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+    flex: 1 1 140px;
+    text-align: center;
+}
+
+/* Bind button */
+.btn-bind {
+    background: linear-gradient(135deg, #6366F1 0%, #FF3B3B 100%);
+    color: white;
+    box-shadow: 0 0 15px #6366F1;
 }
 
 .btn-bind:hover {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
+    background: linear-gradient(135deg, #4F46E5 0%, #FF1C1C 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 0 25px #FF3B3B;
 }
 
 .btn-bind:disabled {
@@ -175,20 +228,17 @@
     cursor: not-allowed;
 }
 
+/* Rebind button */
 .btn-rebind {
-    padding: 10px 20px;
     background: #F59E0B;
     color: white;
-    border: none;
-    border-radius: 10px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
+    box-shadow: 0 0 12px #F59E0B;
 }
 
 .btn-rebind:hover {
     background: #D97706;
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: 0 0 22px #D97706;
 }
 
 .btn-rebind:disabled {
@@ -196,20 +246,17 @@
     cursor: not-allowed;
 }
 
+/* Check button */
 .btn-check {
-    padding: 10px 20px;
-    background: var(--secondary);
+    background: #5558D9;
     color: white;
-    border: none;
-    border-radius: 10px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
+    box-shadow: 0 0 12px #5558D9;
 }
 
 .btn-check:hover {
-    background: #5558d9;
-    transform: translateY(-2px);
+    background: #3B3FC1;
+    transform: translateY(-3px);
+    box-shadow: 0 0 22px #3B3FC1;
 }
 
 .btn-check:disabled {
@@ -225,10 +272,11 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.8);
+    background: rgba(0, 0, 0, 0.85);
     z-index: 10000;
     justify-content: center;
     align-items: center;
+    padding: 15px;
 }
 
 .bind-modal.show {
@@ -236,21 +284,21 @@
 }
 
 .bind-modal-content {
-    background: var(--dark-light);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: #1F1F3A;
     border-radius: 20px;
-    padding: 40px;
-    max-width: 500px;
-    width: 90%;
+    padding: 30px 25px;
+    max-width: 480px;
+    width: 100%;
     max-height: 80vh;
     overflow-y: auto;
-    animation: modalSlideIn 0.3s ease;
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.7);
+    animation: modalSlideIn 0.3s ease forwards;
 }
 
 @keyframes modalSlideIn {
     from {
         opacity: 0;
-        transform: translateY(-50px);
+        transform: translateY(-40px);
     }
     to {
         opacity: 1;
@@ -267,22 +315,24 @@
 
 .bind-modal-header h2 {
     font-size: 1.8em;
-    color: white;
+    color: #A78BFA;
+    text-shadow: 0 0 8px #A78BFA;
 }
 
 .modal-close {
     background: none;
     border: none;
-    color: var(--gray);
-    font-size: 2em;
+    color: #9CA3AF;
+    font-size: 2.2em;
     cursor: pointer;
-    transition: color 0.3s;
+    transition: color 0.3s ease;
 }
 
 .modal-close:hover {
     color: white;
 }
 
+/* Steps */
 .bind-step {
     display: none;
 }
@@ -291,27 +341,31 @@
     display: block;
 }
 
+/* Step indicator dots */
 .step-indicator {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 14px;
     margin-bottom: 30px;
 }
 
 .step-dot {
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.2);
-    transition: all 0.3s;
+    background: rgba(255, 255, 255, 0.15);
+    transition: all 0.3s ease;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.1);
 }
 
 .step-dot.active {
-    background: var(--primary);
-    width: 30px;
-    border-radius: 6px;
+    background: #6366F1;
+    width: 32px;
+    border-radius: 8px;
+    box-shadow: 0 0 18px #6366F1;
 }
 
+/* Form groups */
 .bind-form-group {
     margin-bottom: 25px;
 }
@@ -319,68 +373,77 @@
 .bind-form-group label {
     display: block;
     margin-bottom: 10px;
-    color: #E2E8F0;
-    font-weight: 600;
+    color: #C7D2FE;
+    font-weight: 700;
+    text-shadow: 0 0 4px #C7D2FE;
 }
 
 .bind-form-group input {
     width: 100%;
     padding: 14px 18px;
-    background: rgba(255,255,255,0.05);
-    border: 2px solid rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.15);
     border-radius: 12px;
     color: white;
     font-size: 1em;
+    transition: border-color 0.3s ease;
 }
 
 .bind-form-group input:focus {
     outline: none;
-    border-color: var(--primary);
+    border-color: #6366F1;
 }
 
+/* Info box */
 .bind-info-box {
-    background: rgba(99, 102, 241, 0.1);
-    border: 1px solid rgba(99, 102, 241, 0.3);
+    background: rgba(99, 102, 241, 0.15);
+    border: 1px solid rgba(99, 102, 241, 0.4);
     border-radius: 12px;
-    padding: 15px;
+    padding: 18px 20px;
     margin-bottom: 20px;
-    font-size: 0.9em;
+    font-size: 0.95em;
+    color: #D1D5DB;
+    text-shadow: 0 0 5px rgba(99, 102, 241, 0.7);
 }
 
+/* Verification code */
 .verification-code-display {
-    background: rgba(16, 185, 129, 0.1);
-    border: 2px solid var(--success);
+    background: rgba(16, 185, 129, 0.15);
+    border: 2px solid #10B981;
     border-radius: 12px;
     padding: 20px;
     text-align: center;
-    margin: 20px 0;
+    margin: 25px 0;
 }
 
 .verification-code-display .code {
-    font-size: 2.5em;
+    font-size: 2.8em;
     font-weight: 800;
-    color: var(--success);
+    color: #10B981;
     font-family: 'Courier New', monospace;
-    letter-spacing: 5px;
+    letter-spacing: 6px;
+    text-shadow: 0 0 15px #10B981;
 }
 
+/* Primary modal button */
 .btn-modal-primary {
     width: 100%;
     padding: 16px;
-    background: linear-gradient(135deg, var(--primary) 0%, #FF6B6B 100%);
+    background: linear-gradient(135deg, #6366F1 0%, #FF3B3B 100%);
     color: white;
     border: none;
     border-radius: 12px;
-    font-size: 1.1em;
+    font-size: 1.15em;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
     margin-top: 20px;
+    box-shadow: 0 0 20px #FF3B3B;
 }
 
 .btn-modal-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(255,59,59,0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 0 30px #FF3B3B;
 }
 
 .btn-modal-primary:disabled {
@@ -388,21 +451,48 @@
     cursor: not-allowed;
 }
 
-/* Responsive */
+/* Responsive adjustments */
 @media (max-width: 768px) {
     .bind-account-details {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
     }
 
     .bind-actions {
         flex-direction: column;
+        gap: 15px;
+    }
+
+    .btn-bind,
+    .btn-rebind,
+    .btn-check {
+        flex: 1 1 100%;
     }
 
     .whatsapp-input-group {
         flex-direction: column;
+        gap: 12px;
     }
 
     .btn-save-whatsapp {
         width: 100%;
+    }
+
+    .bind-header-section h1 {
+        font-size: 1.8em;
+    }
+}
+
+/* Small screen tweaks */
+@media (max-width: 400px) {
+    .bind-header-section {
+        padding: 20px 15px;
+    }
+
+    .bind-account-card {
+        padding: 15px 12px;
+    }
+
+    .bind-account-header {
+        font-size: 1em;
     }
 }
