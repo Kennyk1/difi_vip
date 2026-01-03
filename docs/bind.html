@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Phone Binding - FXC Bot Looters</title>
-    <link rel="stylesheet" href="dashboard.css">
-    <link rel="stylesheet" href="bind.css">
+    <link rel="stylesheet" href="dashboard.css" />
+    <link rel="stylesheet" href="bind.css" />
 </head>
 <body>
     <!-- Auth Loading Screen -->
@@ -47,6 +47,10 @@
                     <a href="darino.html" class="nav-item" id="nav-darino">
                         <span class="nav-icon">🎯</span>
                         <span>Darino</span>
+                    </a>
+                    <a href="lavend.html" class="nav-item" id="nav-lavend">
+                        <span class="nav-icon">🤖</span>
+                        <span>Lavend</span>
                     </a>
                 </div>
 
@@ -95,7 +99,7 @@
                             <div class="user-name" id="userName">User</div>
                             <div class="user-role">Member</div>
                         </div>
-                        
+
                         <div class="dropdown-menu" id="userDropdown">
                             <a href="profile.html" class="dropdown-item">
                                 <span>👤</span> Profile
@@ -117,30 +121,14 @@
                 <!-- Header Section -->
                 <div class="bind-header-section">
                     <h1>📱 Phone Binding Management</h1>
-                    <p>Bind WhatsApp numbers to your Darino accounts</p>
+                    <p>Bind WhatsApp numbers to your bot accounts (Darino, Lavend, etc.)</p>
                 </div>
 
-                <!-- WhatsApp App Number Section -->
-                <div class="whatsapp-app-section">
-                    <h3>💬 WhatsApp App Number (Clone Reference)</h3>
-                    <p style="color: var(--gray); margin-bottom: 15px; font-size: 0.9em;">
-                        Save your WhatsApp app number for reference (used for cloning). This is stored locally.
-                    </p>
-                    <div class="whatsapp-input-group">
-                        <input 
-                            type="text" 
-                            id="whatsappAppNumber" 
-                            placeholder="Enter WhatsApp app number (e.g., +2348012345678)"
-                        >
-                        <button class="btn-save-whatsapp" id="btnSaveWhatsApp">
-                            💾 Save Number
-                        </button>
-                    </div>
-                </div>
+                <!-- Removed WhatsApp App Number Section as requested -->
 
                 <!-- Accounts with Binding -->
                 <div class="accounts-with-bind">
-                    <h2 style="margin-bottom: 25px;">📋 Your Darino Accounts</h2>
+                    <h2 style="margin-bottom: 25px;">📋 Your Bot Accounts</h2>
                     <div id="bindAccountsList">
                         <div style="text-align: center; padding: 60px 20px; color: var(--gray);">
                             <div style="font-size: 4em; margin-bottom: 20px;">📱</div>
@@ -178,7 +166,7 @@
                         type="text" 
                         id="bindPhoneNumber" 
                         placeholder="+2348012345678"
-                    >
+                    />
                     <p style="font-size: 0.85em; color: var(--gray); margin-top: 8px;">
                         Include country code (e.g., +234 for Nigeria)
                     </p>
@@ -201,10 +189,10 @@
                 </div>
 
                 <div class="bind-info-box">
-                    📱 <strong>Steps:</strong><br>
-                    1. Open WhatsApp on your phone<br>
-                    2. Go to Settings → Linked Devices<br>
-                    3. Enter the code above<br>
+                    📱 <strong>Steps:</strong><br />
+                    1. Open WhatsApp on your phone<br />
+                    2. Go to Settings → Linked Devices<br />
+                    3. Enter the code above<br />
                     4. Click "Check Status" below when done
                 </div>
 
