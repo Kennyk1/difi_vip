@@ -1,194 +1,475 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chat</title>
-<style>
-/* ================== RESET & BASE ================== */
-* { box-sizing: border-box; margin:0; padding:0; font-family: Arial, sans-serif; }
-body { height:100vh; display:flex; flex-direction:column; background:#f0f2f5; }
-
-/* ================== LAYOUT ================== */
-#app { flex:1; display:flex; overflow:hidden; }
-#sidebar { width:300px; background:#fff; border-right:1px solid #ddd; display:flex; flex-direction:column; }
-#search-container { padding:10px; border-bottom:1px solid #ddd; }
-#search-input { width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; }
-#contacts { flex:1; overflow-y:auto; }
-.contact { display:flex; align-items:center; padding:10px; cursor:pointer; border-bottom:1px solid #eee; transition:background 0.2s; }
-.contact:hover { background:#f5f5f5; }
-.contact img { width:40px; height:40px; border-radius:50%; margin-right:10px; object-fit:cover; }
-.contact .info { display:flex; flex-direction:column; }
-.contact .username { font-weight:bold; }
-.contact .bio { font-size:12px; color:#666; }
-
-/* ================== CHAT WINDOW ================== */
-#chat-window { flex:1; display:flex; flex-direction:column; background:#e5ddd5; }
-#messages { flex:1; overflow-y:auto; padding:10px; }
-.message { margin-bottom:10px; max-width:70%; padding:8px 12px; border-radius:10px; word-wrap:break-word; position:relative; }
-.message.self { background:#dcf8c6; margin-left:auto; text-align:right; }
-.message.other { background:#fff; margin-right:auto; text-align:left; }
-.message img, .message video { max-width:200px; border-radius:10px; margin-top:5px; }
-
-/* ================== INPUT ================== */
-#chat-input-container { display:flex; padding:10px; background:#fff; border-top:1px solid #ddd; }
-#chat-input { flex:1; padding:8px; border:1px solid #ccc; border-radius:4px; }
-#file-input { display:none; }
-#send-btn { padding:8px 12px; margin-left:5px; border:none; background:#007bff; color:#fff; border-radius:4px; cursor:pointer; }
-
-/* ================== RESPONSIVE ================== */
-@media (max-width:768px){
-  #app { flex-direction:column; }
-  #sidebar { width:100%; height:150px; display:flex; flex-direction:column; }
-  #chat-window { flex:1; }
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chat - FXC Bot Looters</title>
+  <style>
+    :root {
+      --primary: #FF3B3B;
+      --primary-dark: #CC2E2E;
+      --gray-light: #A5B4FC;
+      --bg-dark: #121229;
+      --text-light: #E0E7FF;
+      --unread-bg: #FF3B3B;
+    }
+    body {
+      margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-dark); color: var(--text-light);
+      display: flex; flex-direction: column; height: 100vh;
+    }
+    header {
+      background: rgba(15, 23, 42, 0.8);
+      padding: 15px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 1.3em;
+      user-select: none;
+      box-shadow: 0 0 15px var(--primary);
+    }
+    .search-container {
+      padding: 10px 20px;
+      background: rgba(15, 23, 42, 0.9);
+      box-shadow: inset 0 0 15px var(--primary);
+    }
+    #searchInput {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: none;
+      font-size: 1em;
+      background: #252f4a;
+      color: var(--text-light);
+      box-shadow: 0 0 10px var(--primary);
+      transition: box-shadow 0.3s ease;
+    }
+    #searchInput::placeholder {
+      color: var(--gray-light);
+    }
+    #searchInput:focus {
+      outline: none;
+      box-shadow: 0 0 20px var(--primary);
+    }
+    main {
+      flex-grow: 1;
+      overflow-y: auto;
+      background: #181b2f;
+      box-shadow: inset 0 0 30px #FF3B3B33;
+    }
+    ul.chat-list {
+      list-style: none;
+      margin: 0; padding: 0;
+    }
+    li.chat-item {
+      display: flex;
+      align-items: center;
+      padding: 14px 20px;
+      border-bottom: 1px solid #2a2f55;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.3s;
+    }
+    li.chat-item:hover {
+      background: #2a2f55;
+      box-shadow: 0 0 10px var(--primary);
+    }
+    .avatar {
+      flex-shrink: 0;
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: #444a7a;
+      color: var(--text-light);
+      font-size: 1.5em;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      user-select: none;
+      box-shadow: 0 0 8px var(--primary);
+    }
+    .avatar img {
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .chat-info {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .username {
+      font-weight: 700;
+      font-size: 1.1em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-transform: capitalize;
+    }
+    .last-time {
+      font-size: 0.8em;
+      color: var(--gray-light);
+      white-space: nowrap;
+    }
+    .last-message {
+      font-size: 0.95em;
+      color: var(--gray-light);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .unread-count {
+      background: var(--unread-bg);
+      color: white;
+      font-weight: 700;
+      font-size: 0.8em;
+      min-width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 12px;
+      user-select: none;
+      box-shadow: 0 0 8px var(--unread-bg);
+    }
+    .error-msg {
+      padding: 20px;
+      text-align: center;
+      color: var(--primary);
+      font-weight: 700;
+    }
+    /* Responsive */
+    @media (max-width: 600px) {
+      .avatar {
+        width: 40px; height: 40px;
+        font-size: 1.2em;
+        margin-right: 10px;
+      }
+      .username {
+        font-size: 1em;
+      }
+      .last-message {
+        font-size: 0.85em;
+      }
+    }
+  </style>
 </head>
 <body>
+  <header>
+    FXC Bot Looters Chat
+  </header>
 
-<div id="app">
-  <!-- Sidebar / Contacts -->
-  <div id="sidebar">
-    <div id="search-container">
-      <input type="text" id="search-input" placeholder="Search users...">
-    </div>
-    <div id="contacts"></div>
+  <div class="search-container">
+    <input type="search" id="searchInput" placeholder="Search users by username or @handle" autocomplete="off" disabled />
   </div>
 
-  <!-- Chat Window -->
-  <div id="chat-window">
-    <div id="messages"></div>
-    <div id="chat-input-container">
-      <input type="text" id="chat-input" placeholder="Type a message...">
-      <input type="file" id="file-input" accept="image/*,video/*">
-      <button id="send-btn">Send</button>
-    </div>
-  </div>
-</div>
+  <main>
+    <ul class="chat-list" id="chatList">
+      <li class="error-msg" id="statusMsg">Verifying user...</li>
+    </ul>
+  </main>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
-<script>
-// ================== CONFIG ==================
-const API_URL = "https://sample-api-1-ryj7.onrender.com";
-const supabaseUrl = "https://vvkvowtrzmekbdresegf.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2a3Zvd3Ryem1la2JkcmVzZWdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3MDQyMzIsImV4cCI6MjA4MjI4MDIzMn0.ge6YMn01wM_oEm1wT4tx1mUBxwXqUHiKZIQdCIC1-OM";
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+  <script>
+    const API_BASE = "https://sample-api-1-ryj7.onrender.com";
+    const token = localStorage.getItem("auth_token"); // Adjust if you store your token differently
 
-let token = localStorage.getItem("token");
-let currentUser = null;
-let currentChatPartner = null;
+    const chatList = document.getElementById('chatList');
+    const searchInput = document.getElementById('searchInput');
+    const statusMsg = document.getElementById('statusMsg');
 
-// ================== UTILS ==================
-function authHeader() {
-  return { "Authorization": "Bearer " + token };
-}
+    // Utility: format timestamp nicely
+    function formatTime(isoString) {
+      const date = new Date(isoString);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffDays = diffMs / (1000 * 60 * 60 * 24);
 
-function createContactElement(user) {
-  const div = document.createElement("div");
-  div.className = "contact";
-  div.dataset.id = user.id;
-
-  const img = document.createElement("img");
-  img.src = user.avatar_url || `https://ui-avatars.com/api/?name=${user.username}`;
-  div.appendChild(img);
-
-  const info = document.createElement("div");
-  info.className = "info";
-  const name = document.createElement("div");
-  name.className = "username"; name.textContent = user.username;
-  const bio = document.createElement("div");
-  bio.className = "bio"; bio.textContent = user.bio || "";
-  info.appendChild(name); info.appendChild(bio);
-  div.appendChild(info);
-
-  div.addEventListener("click", () => {
-    currentChatPartner = user;
-    loadChatHistory(user.id);
-  });
-
-  return div;
-}
-
-function addMessageToChat(msg, self=false) {
-  const div = document.createElement("div");
-  div.className = "message " + (self ? "self" : "other");
-  div.innerHTML = msg.content || "";
-  if(msg.msg_type==="image") div.innerHTML = `<img src="${msg.file_url}">`;
-  if(msg.msg_type==="video") div.innerHTML = `<video src="${msg.file_url}" controls></video>`;
-  document.getElementById("messages").appendChild(div);
-  div.scrollIntoView({behavior:"smooth"});
-}
-
-// ================== AUTH VERIFY ==================
-async function verifyAuth() {
-  if(!token) return alert("Not logged in");
-  const res = await fetch(`${API_URL}/verify`, {
-    method:"POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({token})
-  });
-  const data = await res.json();
-  if(data.success) currentUser = {id:data.user_id,email:data.email};
-  else { alert("Invalid token"); localStorage.removeItem("token"); }
-}
-
-// ================== SEARCH ==================
-document.getElementById("search-input").addEventListener("input", async e=>{
-  const q = e.target.value;
-  if(!q) return;
-  const res = await fetch(`${API_URL}/search?q=${encodeURIComponent(q)}`, { headers: authHeader() });
-  const users = await res.json();
-  const contactsDiv = document.getElementById("contacts");
-  contactsDiv.innerHTML = "";
-  users.forEach(u=>contactsDiv.appendChild(createContactElement(u)));
-});
-
-// ================== CHAT HISTORY ==================
-async function loadChatHistory(partnerId) {
-  if(!partnerId) return;
-  document.getElementById("messages").innerHTML = "";
-  const res = await fetch(`${API_URL}/history/${partnerId}`, { headers: authHeader() });
-  const msgs = await res.json();
-  msgs.forEach(m=>addMessageToChat(m, m.sender_id===currentUser.id));
-}
-
-// ================== SEND MESSAGE ==================
-document.getElementById("send-btn").addEventListener("click", async ()=>{
-  if(!currentChatPartner) return alert("Select a contact");
-  const input = document.getElementById("chat-input");
-  const fileInput = document.getElementById("file-input");
-  const form = new FormData();
-  form.append("recipient_id", currentChatPartner.id);
-  form.append("content", input.value);
-  if(fileInput.files[0]) form.append("file", fileInput.files[0]);
-
-  const res = await fetch(`${API_URL}/send`, {
-    method:"POST",
-    headers: { "Authorization":"Bearer "+token },
-    body: form
-  });
-  const data = await res.json();
-  if(data.success) addMessageToChat({content:input.value,file_url:data.data?.file_url,msg_type:data.data?.msg_type}, true);
-  input.value = ""; fileInput.value = "";
-});
-
-// ================== SUPABASE REALTIME ==================
-async function subscribeRealtime() {
-  supabase.channel("public:messages")
-    .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, payload=>{
-      const msg = payload.new;
-      if(currentUser && (msg.sender_id===currentUser.id || msg.recipient_id===currentUser.id)) {
-        if(!currentChatPartner || (msg.sender_id===currentChatPartner.id || msg.recipient_id===currentChatPartner.id))
-          addMessageToChat(msg, msg.sender_id===currentUser.id);
+      if (diffDays < 1) {
+        return date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      } else if (diffDays < 7) {
+        return date.toLocaleDateString([], {weekday: 'short'});
+      } else {
+        return date.toLocaleDateString();
       }
-    }).subscribe();
-}
+    }
 
-// ================== INIT ==================
-(async()=>{
-  await verifyAuth();
-  await subscribeRealtime();
-})();
-</script>
+    // Get username from email
+    function getUsername(email) {
+      return email.split('@')[0];
+    }
+
+    // Create avatar element
+    function createAvatar(user) {
+      const div = document.createElement('div');
+      div.className = 'avatar';
+      if (user.avatar_url) {
+        const img = document.createElement('img');
+        img.src = user.avatar_url;
+        img.alt = getUsername(user.email);
+        div.appendChild(img);
+      } else {
+        const letter = getUsername(user.email).charAt(0).toUpperCase();
+        div.textContent = letter;
+      }
+      return div;
+    }
+
+    // Create chat item DOM
+    function createChatItem(chat) {
+      const li = document.createElement('li');
+      li.className = 'chat-item';
+      li.setAttribute('data-user-id', chat.userId);
+
+      li.appendChild(createAvatar(chat));
+
+      const info = document.createElement('div');
+      info.className = 'chat-info';
+
+      const header = document.createElement('div');
+      header.className = 'chat-header';
+
+      const username = document.createElement('div');
+      username.className = 'username';
+      username.textContent = getUsername(chat.email);
+
+      const lastTime = document.createElement('div');
+      lastTime.className = 'last-time';
+      lastTime.textContent = formatTime(chat.lastTimestamp);
+
+      header.appendChild(username);
+      header.appendChild(lastTime);
+
+      const lastMsg = document.createElement('div');
+      lastMsg.className = 'last-message';
+      lastMsg.textContent = chat.lastMessage;
+
+      info.appendChild(header);
+      info.appendChild(lastMsg);
+
+      li.appendChild(info);
+
+      if (chat.unreadCount > 0) {
+        const unread = document.createElement('div');
+        unread.className = 'unread-count';
+        unread.textContent = chat.unreadCount;
+        li.appendChild(unread);
+      }
+
+      li.addEventListener('click', () => {
+        window.location.href = `userschat.html?userId=${chat.userId}`;
+      });
+
+      return li;
+    }
+
+    // Render chat list
+    function renderChats(list) {
+      chatList.innerHTML = '';
+      if (!list.length) {
+        chatList.innerHTML = '<li class="error-msg">No chats found</li>';
+        return;
+      }
+      list.forEach(chat => {
+        chatList.appendChild(createChatItem(chat));
+      });
+    }
+
+    // Verify user auth on load
+    async function verifyUser() {
+      if (!token) {
+        statusMsg.textContent = "Not logged in. Redirecting to login...";
+        setTimeout(() => window.location.href = "login.html", 2000);
+        return false;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/auth/verify`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("Verification failed");
+        const data = await res.json();
+        if (data.success) {
+          statusMsg.style.display = 'none';
+          searchInput.disabled = false;
+          return true;
+        } else {
+          statusMsg.textContent = "Unauthorized. Redirecting to login...";
+          setTimeout(() => window.location.href = "login.html", 2000);
+          return false;
+        }
+      } catch (e) {
+        statusMsg.textContent = "Error verifying user. Please try again.";
+        console.error(e);
+        return false;
+      }
+    }
+
+    // Fetch recent chats: get distinct users you chatted with and last message info
+    async function fetchRecentChats() {
+      // We don't have a dedicated recent chats API,
+      // so we must fetch all messages involving current user and group by partner.
+
+      // Get current user ID from token payload (decode without verification)
+      function parseUserIdFromToken(token) {
+        try {
+          const base64Url = token.split('.')[1];
+          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+          const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+          }).join(''));
+          return JSON.parse(jsonPayload).user_id;
+        } catch {
+          return null;
+        }
+      }
+
+      const userId = parseUserIdFromToken(token);
+      if (!userId) {
+        statusMsg.textContent = "Invalid token. Please login again.";
+        return [];
+      }
+
+      try {
+        // Fetch all messages where user is sender or recipient
+        const res = await fetch(`${API_BASE}/chat/history/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("Failed to fetch chat history");
+        const messages = await res.json();
+
+        // Group messages by chat partner (other user)
+        const chatsMap = new Map();
+
+        messages.forEach(msg => {
+          const partnerId = msg.sender_id === userId ? msg.recipient_id : msg.sender_id;
+          if (!chatsMap.has(partnerId)) {
+            chatsMap.set(partnerId, {
+              userId: partnerId,
+              lastMessage: msg.content,
+              lastTimestamp: msg.created_at,
+              unreadCount: 0 // We'll calculate unread count separately if you have that data
+            });
+          } else {
+            // Update last message if newer
+            if (new Date(msg.created_at) > new Date(chatsMap.get(partnerId).lastTimestamp)) {
+              chatsMap.get(partnerId).lastMessage = msg.content;
+              chatsMap.get(partnerId).lastTimestamp = msg.created_at;
+            }
+          }
+        });
+
+        // For each partner, fetch user info (email, avatar_url, bio)
+        const chats = [];
+        for (const [partnerId, chat] of chatsMap.entries()) {
+          const userRes = await fetch(`${API_BASE}/chat/search?q=`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          // Your /chat/search requires query, so we fetch user by id below instead:
+          const userInfoRes = await fetch(`${API_BASE}/user/profile/${partnerId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          let userInfo = null;
+          if (userInfoRes.ok) {
+            userInfo = await userInfoRes.json();
+          }
+          // Fallback if no user info found
+          chats.push({
+            userId: partnerId,
+            email: userInfo?.email || 'unknown@example.com',
+            avatar_url: userInfo?.avatar_url || null,
+            lastMessage: chat.lastMessage,
+            lastTimestamp: chat.lastTimestamp,
+            unreadCount: chat.unreadCount || 0
+          });
+        }
+
+        return chats;
+      } catch (e) {
+        console.error("Error fetching recent chats:", e);
+        return [];
+      }
+    }
+
+    // Search users via API
+    async function searchUsers(query) {
+      if (!token) return [];
+      try {
+        const res = await fetch(`${API_BASE}/chat/search?q=${encodeURIComponent(query)}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("Search request failed");
+        const data = await res.json();
+        return data;
+      } catch (e) {
+        console.error("Search error:", e);
+        return [];
+      }
+    }
+
+    // Render chats to UI
+    function renderChats(list) {
+      chatList.innerHTML = '';
+      if (!list.length) {
+        chatList.innerHTML = '<li class="error-msg">No chats found</li>';
+        return;
+      }
+      list.forEach(chat => {
+        chatList.appendChild(createChatItem(chat));
+      });
+    }
+
+    // Debounce helper
+    function debounce(fn, delay) {
+      let timeout;
+      return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => fn.apply(this, args), delay);
+      };
+    }
+
+    // Initialize page
+    (async () => {
+      const verified = await verifyUser();
+      if (!verified) return;
+
+      // Load recent chats from messages grouped by partner
+      statusMsg.textContent = "Loading chats...";
+      try {
+        const recentChats = await fetchRecentChats();
+        renderChats(recentChats);
+      } catch {
+        renderChats([]);
+      }
+
+      // Enable search box
+      searchInput.disabled = false;
+
+      // Search input handler (debounced)
+      const onSearch = debounce(async () => {
+        const q = searchInput.value.trim();
+        if (!q) {
+          // Reload recent chats if no query
+          const recentChats = await fetchRecentChats();
+          renderChats(recentChats);
+          return;
+        }
+        const results = await searchUsers(q);
+        // Add username field from email for display
+        results.forEach(u => {
+          u.username = u.email.split('@')[0];
+          u.userId = u.id || u.userId || u.id;
+        });
+        renderChats(results);
+      }, 300);
+
+      searchInput.addEventListener('input', onSearch);
+    })();
+  </script>
 </body>
 </html>
