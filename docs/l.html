@@ -536,308 +536,338 @@
     </div>
 
     <script src="dashboard.js"></script>
-    <script>
-        const API_BASE_URL = 'https://sample-api-1-ryj7.onrender.com';
+<script>
+    const API_BASE_URL = 'https://sample-api-1-ryj7.onrender.com';
 
-        // Profile Management
-        let currentUserProfile = null;
+    // Profile Management
+    let currentUserProfile = null;
 
-        // Show Alert
-        function showAlert(elementId, message, type = 'info') {
-            const alert = document.getElementById(elementId);
-            alert.textContent = message;
-            alert.className = `alert ${type} show`;
-            setTimeout(() => alert.classList.remove('show'), 5000);
+    // Show Alert
+    function showAlert(elementId, message, type = 'info') {
+        const alert = document.getElementById(elementId);
+        alert.textContent = message;
+        alert.className = `alert ${type} show`;
+        setTimeout(() => alert.classList.remove('show'), 5000);
+    }
+
+    // API Helper with token
+    async function apiCall(endpoint, options = {}) {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No authentication token found');
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                ...options.headers
+            },
+            ...options
+        };
+
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.error || `HTTP ${response.status}`);
         }
 
-        // API Helper with token
-        async function apiCall(endpoint, options = {}) {
-            const token = localStorage.getItem('token');
-            if (!token) throw new Error('No authentication token found');
+        return data;
+    }
 
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                    ...options.headers
-                },
-                ...options
-            };
+    // File upload helper - FIXED VERSION
+    async function uploadAvatar(file) {
+        const formData = new FormData();
+        
+        // Create filename with proper extension based on file type
+        const mimeToExt = {
+            'image/jpeg': 'jpg',
+            'image/jpg': 'jpg',
+            'image/png': 'png',
+            'image/gif': 'gif',
+            'image/webp': 'webp'
+        };
+        
+        const mimeType = file.type || 'image/jpeg'; // fallback
+        const extension = mimeToExt[mimeType] || 'jpg';
+        const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${extension}`;
+        
+        // Append file with proper filename and ensure content type is set
+        formData.append('avatar', file, fileName);
+        
+        // Debug: Log file info
+        console.log('Uploading file:', {
+            name: fileName,
+            originalName: file.name,
+            size: file.size,
+            type: file.type,
+            mimeType: mimeType
+        });
 
-            const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-            const data = await response.json();
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE_URL}/auth/profile/avatar`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+                // Note: Don't set Content-Type header - let browser set multipart/form-data with boundary
+            },
+            body: formData
+        });
 
-            if (!response.ok || !data.success) {
-                throw new Error(data.error || `HTTP ${response.status}`);
-            }
-
-            return data;
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+            throw new Error(data.error || 'Upload failed');
         }
+        return data.avatar_url;
+    }
 
-        // File upload helper
-        async function uploadAvatar(file) {
-            const formData = new FormData();
-            formData.append('avatar', file);
+    // Load User Profile
+    async function loadUserProfile() {
+        try {
+            const data = await apiCall('/auth/profile');
+            currentUserProfile = data.user;
+            
+            // Update profile display
+            updateProfileDisplay(currentUserProfile);
+            
+        } catch (error) {
+            console.error('Failed to load profile:', error);
+            showAlert('profileAlert', 'Failed to load profile data', 'error');
+        }
+    }
 
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${API_BASE_URL}/auth/profile/avatar`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formData
+    // Update Profile Display
+    function updateProfileDisplay(profile) {
+        const email = profile.email || 'user@example.com';
+        const displayName = profile.username || email.split('@')[0];
+        
+        // Update all profile elements
+        document.getElementById('profileName').textContent = displayName.charAt(0).toUpperCase() + displayName.slice(1);
+        document.getElementById('profileEmail').textContent = email;
+        document.getElementById('displayName').value = displayName;
+        document.getElementById('bio').value = profile.bio || '';
+        
+        // Update avatar
+        const avatarUrl = profile.avatar_url;
+        const avatarImg = document.getElementById('profileAvatarImg');
+        const avatarElements = [avatarImg, document.getElementById('userAvatar'), document.getElementById('profileAvatarLarge')];
+        
+        if (avatarUrl) {
+            avatarElements.forEach(el => {
+                if (el.tagName === 'IMG') {
+                    el.src = avatarUrl;
+                    el.style.display = 'block';
+                } else {
+                    el.innerHTML = `<img src="${avatarUrl}" alt="Avatar" class="avatar-fallback-img">`;
+                }
             });
-
-            const data = await response.json();
-            if (!response.ok || !data.success) {
-                throw new Error(data.error || 'Upload failed');
-            }
-            return data.avatar_url;
-        }
-
-        // Load User Profile
-        async function loadUserProfile() {
-            try {
-                const data = await apiCall('/auth/profile');
-                currentUserProfile = data.user;
-                
-                // Update profile display
-                updateProfileDisplay(currentUserProfile);
-                
-            } catch (error) {
-                console.error('Failed to load profile:', error);
-                showAlert('profileAlert', 'Failed to load profile data', 'error');
-            }
-        }
-
-        // Update Profile Display
-        function updateProfileDisplay(profile) {
-            const email = profile.email || 'user@example.com';
-            const displayName = profile.username || email.split('@')[0];
-            
-            // Update all profile elements
-            document.getElementById('profileName').textContent = displayName.charAt(0).toUpperCase() + displayName.slice(1);
-            document.getElementById('profileEmail').textContent = email;
-            document.getElementById('displayName').value = displayName;
-            document.getElementById('bio').value = profile.bio || '';
-            
-            // Update avatar
-            const avatarUrl = profile.avatar_url;
-            const avatarImg = document.getElementById('profileAvatarImg');
-            const avatarElements = [avatarImg, document.getElementById('userAvatar'), document.getElementById('profileAvatarLarge')];
-            
-            if (avatarUrl) {
-                avatarElements.forEach(el => {
-                    if (el.tagName === 'IMG') {
-                        el.src = avatarUrl;
-                        el.style.display = 'block';
-                    } else {
-                        el.innerHTML = `<img src="${avatarUrl}" alt="Avatar" class="avatar-fallback-img">`;
-                    }
-                });
-            } else {
-                const initial = displayName.charAt(0).toUpperCase();
-                avatarElements.forEach(el => {
-                    if (el.tagName === 'IMG') {
-                        el.style.display = 'none';
-                    } else {
-                        el.textContent = initial;
-                    }
-                });
-            }
-            
-            // Update bio counter
-            updateBioCounter();
-            
-            // Update user dropdown
-            document.getElementById('userName').textContent = displayName;
-        }
-
-        // Update Bio Character Counter
-        function updateBioCounter() {
-            const bio = document.getElementById('bio');
-            const counter = document.getElementById('bioCounter');
-            const length = bio.value.length;
-            counter.textContent = `${length}/500`;
-            counter.className = length > 450 ? 'char-counter warning' : 'char-counter';
-        }
-
-        // Handle Avatar Upload
-        document.getElementById('avatarInput').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            // Validate file
-            if (file.size > 5 * 1024 * 1024) {
-                showAlert('profileAlert', 'File size must be less than 5MB', 'error');
-                return;
-            }
-
-            const btn = document.getElementById('profileSaveBtn');
-            btn.disabled = true;
-            btn.classList.add('loading');
-            btn.textContent = '📤 Uploading...';
-
-            try {
-                const avatarUrl = await uploadAvatar(file);
-                showAlert('profileAlert', '✅ Profile photo updated successfully!', 'success');
-                
-                // Update current profile
-                if (currentUserProfile) {
-                    currentUserProfile.avatar_url = avatarUrl;
-                    updateProfileDisplay(currentUserProfile);
+        } else {
+            const initial = displayName.charAt(0).toUpperCase();
+            avatarElements.forEach(el => {
+                if (el.tagName === 'IMG') {
+                    el.style.display = 'none';
+                } else {
+                    el.textContent = initial;
                 }
-                
-            } catch (error) {
-                console.error('Avatar upload error:', error);
-                showAlert('profileAlert', error.message || 'Failed to upload avatar', 'error');
-            } finally {
-                btn.disabled = false;
-                btn.classList.remove('loading');
-                btn.textContent = '💾 Save Changes';
-                e.target.value = '';
-            }
-        });
+            });
+        }
+        
+        // Update bio counter
+        updateBioCounter();
+        
+        // Update user dropdown
+        document.getElementById('userName').textContent = displayName;
+    }
 
-        // Handle Profile Form Submit
-        document.getElementById('profileForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+    // Update Bio Character Counter
+    function updateBioCounter() {
+        const bio = document.getElementById('bio');
+        const counter = document.getElementById('bioCounter');
+        const length = bio.value.length;
+        counter.textContent = `${length}/500`;
+        counter.className = length > 450 ? 'char-counter warning' : 'char-counter';
+    }
+
+    // Handle Avatar Upload - FIXED VERSION
+    document.getElementById('avatarInput').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Enhanced file validation
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        if (!validTypes.includes(file.type)) {
+            showAlert('profileAlert', 'Please select a valid image file (JPG, PNG, GIF, WebP)', 'error');
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            showAlert('profileAlert', 'File size must be less than 5MB', 'error');
+            return;
+        }
+
+        const btn = document.getElementById('profileSaveBtn');
+        btn.disabled = true;
+        btn.classList.add('loading');
+        btn.textContent = '📤 Uploading...';
+
+        try {
+            const avatarUrl = await uploadAvatar(file);
+            showAlert('profileAlert', '✅ Profile photo updated successfully!', 'success');
             
-            const displayName = document.getElementById('displayName').value.trim();
-            const bio = document.getElementById('bio').value.trim();
-            
-            const btn = document.getElementById('profileSaveBtn');
-            btn.disabled = true;
-            btn.classList.add('loading');
-            btn.textContent = '💾 Saving...';
-
-            try {
-                await apiCall('/auth/profile', {
-                    method: 'PUT',
-                    body: JSON.stringify({
-                        bio: bio || null
-                    })
-                });
-                
-                showAlert('profileAlert', '✅ Profile updated successfully!', 'success');
-                
-                // Update current profile and display
-                if (currentUserProfile) {
-                    currentUserProfile.bio = bio;
-                    updateProfileDisplay(currentUserProfile);
-                }
-                
-            } catch (error) {
-                console.error('Profile update error:', error);
-                showAlert('profileAlert', error.message || 'Failed to update profile', 'error');
-            } finally {
-                btn.disabled = false;
-                btn.classList.remove('loading');
-                btn.textContent = '💾 Save Changes';
-            }
-        });
-
-        // Reset Profile Form
-        document.getElementById('profileResetBtn').addEventListener('click', () => {
+            // Update current profile
             if (currentUserProfile) {
+                currentUserProfile.avatar_url = avatarUrl;
                 updateProfileDisplay(currentUserProfile);
-                showAlert('profileAlert', 'Profile reset to current values', 'info');
-            }
-        });
-
-        // Bio counter listener
-        document.getElementById('bio').addEventListener('input', updateBioCounter);
-
-        // Existing password form handler (unchanged)
-        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const currentPassword = document.getElementById('currentPassword').value;
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const passwordBtn = document.getElementById('passwordBtn');
-            
-            if (newPassword.length < 6) {
-                showAlert('passwordAlert', 'New password must be at least 6 characters', 'error');
-                return;
-            }
-            if (newPassword !== confirmPassword) {
-                showAlert('passwordAlert', 'Passwords do not match', 'error');
-                return;
             }
             
-            passwordBtn.disabled = true;
-            passwordBtn.classList.add('loading');
+        } catch (error) {
+            console.error('Avatar upload error:', error);
+            showAlert('profileAlert', error.message || 'Failed to upload avatar', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.classList.remove('loading');
+            btn.textContent = '💾 Save Changes';
+            e.target.value = '';
+        }
+    });
+
+    // Handle Profile Form Submit
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const displayName = document.getElementById('displayName').value.trim();
+        const bio = document.getElementById('bio').value.trim();
+        
+        const btn = document.getElementById('profileSaveBtn');
+        btn.disabled = true;
+        btn.classList.add('loading');
+        btn.textContent = '💾 Saving...';
+
+        try {
+            await apiCall('/auth/profile', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    bio: bio || null
+                })
+            });
             
-            try {
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                showAlert('passwordAlert', '✓ Password changed successfully!', 'success');
-                document.getElementById('passwordForm').reset();
-            } catch (error) {
-                showAlert('passwordAlert', 'Failed to change password', 'error');
-            } finally {
-                passwordBtn.disabled = false;
-                passwordBtn.classList.remove('loading');
+            showAlert('profileAlert', '✅ Profile updated successfully!', 'success');
+            
+            // Update current profile and display
+            if (currentUserProfile) {
+                currentUserProfile.bio = bio;
+                updateProfileDisplay(currentUserProfile);
             }
-        });
-
-        // Confirm Delete Account (unchanged)
-        function confirmDeleteAccount() {
-            const confirmed = confirm('⚠️ Are you sure you want to delete your account?\n\nThis action cannot be undone.');
-            if (confirmed) {
-                const doubleConfirm = confirm('🚨 FINAL WARNING!\n\nType YES to confirm deletion.');
-                if (doubleConfirm) deleteAccount();
-            }
+            
+        } catch (error) {
+            console.error('Profile update error:', error);
+            showAlert('profileAlert', error.message || 'Failed to update profile', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.classList.remove('loading');
+            btn.textContent = '💾 Save Changes';
         }
+    });
 
-        async function deleteAccount() {
-            try {
-                showToast('Account deleted. Redirecting...', 'error');
-                setTimeout(() => logout(), 2000);
-            } catch (error) {
-                showToast('Failed to delete account', 'error');
-            }
+    // Reset Profile Form
+    document.getElementById('profileResetBtn').addEventListener('click', () => {
+        if (currentUserProfile) {
+            updateProfileDisplay(currentUserProfile);
+            showAlert('profileAlert', 'Profile reset to current values', 'info');
         }
+    });
 
-        // Load User Stats (unchanged)
-        async function loadUserStats() {
-            try {
-                // Implementation remains the same
-                const stats = await apiCall('/dashboard/stats');
-                if (stats && stats.success) {
-                    document.getElementById('totalAccountsProfile').textContent = formatNumber(stats.stats.total_accounts || 0);
-                    const botsUsed = Object.keys(stats.stats.accounts_by_bot || {}).length;
-                    document.getElementById('botsUsedProfile').textContent = botsUsed;
-                    const rate = stats.stats.total_accounts > 0 
-                        ? Math.round((stats.stats.success_accounts / stats.stats.total_accounts) * 100)
-                        : 0;
-                    document.getElementById('successRateProfile').textContent = rate + '%';
-                }
-            } catch (error) {
-                console.error('Error loading stats:', error);
-            }
+    // Bio counter listener
+    document.getElementById('bio').addEventListener('input', updateBioCounter);
+
+    // Existing password form handler (unchanged)
+    document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const passwordBtn = document.getElementById('passwordBtn');
+        
+        if (newPassword.length < 6) {
+            showAlert('passwordAlert', 'New password must be at least 6 characters', 'error');
+            return;
         }
+        if (newPassword !== confirmPassword) {
+            showAlert('passwordAlert', 'Passwords do not match', 'error');
+            return;
+        }
+        
+        passwordBtn.disabled = true;
+        passwordBtn.classList.add('loading');
+        
+        try {
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            showAlert('passwordAlert', '✓ Password changed successfully!', 'success');
+            document.getElementById('passwordForm').reset();
+        } catch (error) {
+            showAlert('passwordAlert', 'Failed to change password', 'error');
+        } finally {
+            passwordBtn.disabled = false;
+            passwordBtn.classList.remove('loading');
+        }
+    });
 
-        // Initialize page
-        window.addEventListener('DOMContentLoaded', async () => {
-            const user = await initDashboard('nav-profile');
-            if (user) {
-                // Set account info
-                const email = user.email || 'user@example.com';
-                document.getElementById('email').value = email;
-                document.getElementById('userId').value = user.id || 'USER-123456';
-                
-                if (user.created_at) {
-                    const date = new Date(user.created_at);
-                    document.getElementById('memberSince').value = date.toLocaleDateString('en-US', {
-                        year: 'numeric', month: 'long'
-                    });
-                }
-                
-                // Load profile and stats
-                await Promise.all([loadUserProfile(), loadUserStats()]);
+    // Confirm Delete Account (unchanged)
+    function confirmDeleteAccount() {
+        const confirmed = confirm('⚠️ Are you sure you want to delete your account?\n\nThis action cannot be undone.');
+        if (confirmed) {
+            const doubleConfirm = confirm('🚨 FINAL WARNING!\n\nType YES to confirm deletion.');
+            if (doubleConfirm) deleteAccount();
+        }
+    }
+
+    async function deleteAccount() {
+        try {
+            showToast('Account deleted. Redirecting...', 'error');
+            setTimeout(() => logout(), 2000);
+        } catch (error) {
+            showToast('Failed to delete account', 'error');
+        }
+    }
+
+    // Load User Stats (unchanged)
+    async function loadUserStats() {
+        try {
+            const stats = await apiCall('/dashboard/stats');
+            if (stats && stats.success) {
+                document.getElementById('totalAccountsProfile').textContent = formatNumber(stats.stats.total_accounts || 0);
+                const botsUsed = Object.keys(stats.stats.accounts_by_bot || {}).length;
+                document.getElementById('botsUsedProfile').textContent = botsUsed;
+                const rate = stats.stats.total_accounts > 0 
+                    ? Math.round((stats.stats.success_accounts / stats.stats.total_accounts) * 100)
+                    : 0;
+                document.getElementById('successRateProfile').textContent = rate + '%';
             }
-        });
-    </script>
+        } catch (error) {
+            console.error('Error loading stats:', error);
+        }
+    }
+
+    // Initialize page
+    window.addEventListener('DOMContentLoaded', async () => {
+        const user = await initDashboard('nav-profile');
+        if (user) {
+            // Set account info
+            const email = user.email || 'user@example.com';
+            document.getElementById('email').value = email;
+            document.getElementById('userId').value = user.id || 'USER-123456';
+            
+            if (user.created_at) {
+                const date = new Date(user.created_at);
+                document.getElementById('memberSince').value = date.toLocaleDateString('en-US', {
+                    year: 'numeric', month: 'long'
+                });
+            }
+            
+            // Load profile and stats
+            await Promise.all([loadUserProfile(), loadUserStats()]);
+        }
+    });
+</script>
 
     <style>
         /* Additional CSS for new profile features */
