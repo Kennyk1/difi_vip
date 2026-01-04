@@ -1,193 +1,589 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>User Profile</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #121229;
-      color: #E0E7FF;
-      padding: 20px;
-      max-width: 400px;
-      margin: auto;
-      text-align: center;
-    }
-    h1 {
-      color: #FF3B3B;
-      margin-bottom: 20px;
-    }
-    .avatar {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      background: #444a7a;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 64px;
-      color: #E0E7FF;
-      margin-bottom: 15px;
-      overflow: hidden;
-      box-shadow: 0 0 8px #FF3B3B;
-    }
-    .avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .username {
-      font-size: 1.8em;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-    .bio {
-      font-size: 1em;
-      color: #A5B4FC;
-      white-space: pre-wrap;
-      min-height: 60px;
-    }
-    #statusMsg {
-      margin-top: 30px;
-      font-weight: 600;
-      color: #FF3B3B;
-    }
-    /* Spinner */
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid rgba(255,255,255,0.1);
-      border-top-color: #FF3B3B;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 20px auto;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - FXC Bot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #0a0e27;
+            color: #e4e6eb;
+            min-height: 100vh;
+        }
+
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #111827;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .profile-header {
+            padding: 15px 20px;
+            background: #1a1f35;
+            border-bottom: 1px solid #2d3548;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: #4f46e5;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .header-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            color: #6b7280;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            position: relative;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 40px;
+            background: #1a1f35;
+            border: 1px solid #2d3548;
+            border-radius: 8px;
+            min-width: 150px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 12px 20px;
+            color: #e4e6eb;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .dropdown-menu a:hover {
+            background: #2d3548;
+        }
+
+        /* Profile Info */
+        .profile-info {
+            padding: 40px 20px;
+            text-align: center;
+            background: linear-gradient(180deg, #1a1f35 0%, #111827 100%);
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 48px;
+            margin: 0 auto 20px;
+            border: 4px solid #2d3548;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .profile-username {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .profile-email {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+        .profile-bio {
+            max-width: 500px;
+            margin: 0 auto 30px;
+            padding: 20px;
+            background: #1a1f35;
+            border-radius: 12px;
+            color: #9ca3af;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+
+        .btn-secondary {
+            background: #2d3548;
+            color: #e4e6eb;
+        }
+
+        .btn-secondary:hover {
+            background: #3d4558;
+        }
+
+        /* Stats */
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            margin: 20px;
+            background: #1a1f35;
+            border-radius: 12px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #4f46e5;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #6b7280;
+            text-transform: uppercase;
+        }
+
+        /* Messages Section */
+        .messages-section {
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding: 0 20px;
+            color: #fff;
+        }
+
+        .message-item {
+            background: #1a1f35;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            border-left: 3px solid #4f46e5;
+        }
+
+        .message-content {
+            color: #e4e6eb;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .message-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .mention {
+            color: #60a5fa;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .mention:hover {
+            text-decoration: underline;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 3px solid #2d3548;
+            border-top: 3px solid #4f46e5;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7280;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1f35;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2d3548;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3d4558;
+        }
+    </style>
 </head>
 <body>
+    <div class="profile-container">
+        <!-- Header -->
+        <div class="profile-header">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <div class="header-title">Profile</div>
+            <button class="menu-btn" id="menuBtn">⋮
+                <div class="dropdown-menu" id="menuDropdown">
+                    <a href="chat.html">Chats</a>
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="#" id="logoutBtn">Logout</a>
+                </div>
+            </button>
+        </div>
 
-  <h1>User Profile</h1>
+        <!-- Loading State -->
+        <div class="loading" id="loadingState">
+            <div class="spinner"></div>
+        </div>
 
-  <div class="avatar" id="avatarContainer"></div>
-  <div class="username" id="username"></div>
-  <div class="bio" id="bio"></div>
+        <!-- Profile Content -->
+        <div id="profileContent" style="display: none;">
+            <!-- Profile Info -->
+            <div class="profile-info">
+                <div class="profile-avatar" id="userAvatar"></div>
+                <div class="profile-username" id="username">@username</div>
+                <div class="profile-email" id="userEmail">email@example.com</div>
+                <div class="profile-bio" id="userBio">No bio available</div>
+                <div class="profile-actions" id="profileActions"></div>
+            </div>
 
-  <div id="statusMsg"></div>
+            <!-- Stats -->
+            <div class="profile-stats" id="profileStats" style="display: none;">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalMessages">0</div>
+                    <div class="stat-label">Messages</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="sharedMedia">0</div>
+                    <div class="stat-label">Media</div>
+                </div>
+            </div>
 
-  <script>
-    const API_BASE = "https://sample-api-1-ryj7.onrender.com";
-    const token = localStorage.getItem("token");
+            <!-- Recent Messages -->
+            <div class="messages-section" id="messagesSection" style="display: none;">
+                <div class="section-title">Recent Messages</div>
+                <div id="messagesList"></div>
+            </div>
+        </div>
+    </div>
 
-    const avatarContainer = document.getElementById("avatarContainer");
-    const usernameDiv = document.getElementById("username");
-    const bioDiv = document.getElementById("bio");
-    const statusMsg = document.getElementById("statusMsg");
+    <script>
+        const API_URL = 'https://sample-api-1-ryj7.onrender.com';
+        let token = localStorage.getItem('token');
+        let currentUser = null;
+        let viewingUserId = null;
+        let isOwnProfile = false;
 
-    // Show spinner and message
-    function showLoading(message = "Loading...") {
-      statusMsg.innerHTML = `
-        <div class="spinner"></div>
-        <p>${message}</p>
-      `;
-      statusMsg.style.color = "#A5B4FC";
-    }
-
-    function hideLoading() {
-      statusMsg.innerHTML = "";
-    }
-
-    // Get userId from URL query param (?userId=...)
-    function getUserIdFromUrl() {
-      const params = new URLSearchParams(window.location.search);
-      return params.get("userId");
-    }
-
-    // Render avatar or placeholder letter
-    function renderAvatar(url, username) {
-      avatarContainer.innerHTML = "";
-      if (url) {
-        const img = document.createElement("img");
-        img.src = url;
-        img.alt = username;
-        img.onerror = () => {
-          // Fallback to placeholder if image fails
-          avatarContainer.textContent = username.charAt(0).toUpperCase();
-        };
-        avatarContainer.appendChild(img);
-      } else {
-        avatarContainer.textContent = username.charAt(0).toUpperCase();
-      }
-    }
-
-    // Verify token with backend
-    async function verifyToken() {
-      if (!token) {
-        statusMsg.textContent = "Not logged in. Redirecting to login...";
-        setTimeout(() => window.location.href = "login.html", 2000);
-        return false;
-      }
-      showLoading("Verifying authentication...");
-      try {
-        const res = await fetch(`${API_BASE}/auth/verify`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token })
-        });
-        const data = await res.json();
-        if (data.success && data.valid) {
-          hideLoading();
-          return true;
-        } else {
-          statusMsg.textContent = "Unauthorized. Redirecting to login...";
-          setTimeout(() => window.location.href = "login.html", 2000);
-          return false;
+        if (!token) {
+            window.location.href = 'login.html';
         }
-      } catch (e) {
-        statusMsg.textContent = "Error verifying user. Please try again.";
-        console.error(e);
-        return false;
-      }
-    }
 
-    // Fetch user profile data from API
-    async function fetchUserProfile(userId) {
-      showLoading("Loading user profile...");
-      try {
-        const res = await fetch(`${API_BASE}/userprofile/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` }
+        // Get user ID to view
+        viewingUserId = localStorage.getItem('viewUserProfile');
+        if (!viewingUserId) {
+            window.location.href = 'chat.html';
+        }
+
+        async function init() {
+            await getCurrentUser();
+            await loadUserProfile();
+        }
+
+        async function getCurrentUser() {
+            try {
+                const res = await fetch(`${API_URL}/auth/profile`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    currentUser = data.user;
+                    isOwnProfile = currentUser.id === viewingUserId;
+                } else {
+                    localStorage.removeItem('token');
+                    window.location.href = 'login.html';
+                }
+            } catch (err) {
+                console.error('Error fetching current user:', err);
+            }
+        }
+
+        async function loadUserProfile() {
+            try {
+                const res = await fetch(`${API_URL}/auth/userprofile/${viewingUserId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    displayProfile(data.user);
+                    if (!isOwnProfile) {
+                        await loadSharedMessages(data.user);
+                    }
+                } else {
+                    alert('Failed to load profile');
+                    goBack();
+                }
+            } catch (err) {
+                console.error('Error loading profile:', err);
+                alert('Failed to load profile');
+                goBack();
+            }
+        }
+
+        function displayProfile(user) {
+            // Avatar
+            const avatar = document.getElementById('userAvatar');
+            if (user.avatar_url) {
+                avatar.innerHTML = `<img src="${user.avatar_url}" alt="${user.username}">`;
+            } else {
+                avatar.textContent = user.username.charAt(0).toUpperCase();
+            }
+
+            // Info
+            document.getElementById('username').textContent = `@${user.username}`;
+            document.getElementById('userEmail').textContent = user.email;
+            document.getElementById('userBio').textContent = user.bio || 'No bio available';
+
+            // Actions
+            const actionsContainer = document.getElementById('profileActions');
+            if (isOwnProfile) {
+                actionsContainer.innerHTML = `
+                    <button class="action-btn btn-primary" onclick="editProfile()">Edit Profile</button>
+                    <button class="action-btn btn-secondary" onclick="window.location.href='dashboard.html'">Dashboard</button>
+                `;
+            } else {
+                actionsContainer.innerHTML = `
+                    <button class="action-btn btn-primary" onclick="sendMessage()">Send Message</button>
+                    <button class="action-btn btn-secondary" onclick="blockUser()">Block User</button>
+                `;
+            }
+
+            // Show content
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('profileContent').style.display = 'block';
+        }
+
+        async function loadSharedMessages(user) {
+            try {
+                const res = await fetch(`${API_URL}/chat/history/${viewingUserId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const messages = await res.json();
+
+                if (messages && messages.length > 0) {
+                    displayMessages(messages, user);
+                    updateStats(messages);
+                }
+            } catch (err) {
+                console.error('Error loading messages:', err);
+            }
+        }
+
+        function displayMessages(messages, user) {
+            const section = document.getElementById('messagesSection');
+            const list = document.getElementById('messagesList');
+
+            // Get last 5 messages
+            const recentMessages = messages.slice(-5).reverse();
+
+            if (recentMessages.length === 0) {
+                list.innerHTML = '<div class="empty-state">No messages yet</div>';
+            } else {
+                list.innerHTML = recentMessages.map(msg => {
+                    const content = processMessageContent(msg.content);
+                    const sender = msg.sender_id === currentUser.id ? 'You' : `@${user.username}`;
+                    
+                    return `
+                        <div class="message-item">
+                            <div class="message-content">${content}</div>
+                            <div class="message-meta">
+                                <span>${sender}</span>
+                                <span>${formatTime(msg.created_at)}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            section.style.display = 'block';
+        }
+
+        function updateStats(messages) {
+            const stats = document.getElementById('profileStats');
+            document.getElementById('totalMessages').textContent = messages.length;
+            
+            const mediaCount = messages.filter(m => m.msg_type === 'image' || m.msg_type === 'video').length;
+            document.getElementById('sharedMedia').textContent = mediaCount;
+            
+            stats.style.display = 'grid';
+        }
+
+        function processMessageContent(content) {
+            if (!content) return '';
+            // Convert @mentions to clickable links
+            return content.replace(/@(\w+)/g, '<span class="mention" onclick="searchAndViewUser(\'$1\')">@$1</span>');
+        }
+
+        async function searchAndViewUser(username) {
+            try {
+                const res = await fetch(`${API_URL}/chat/search?q=${username}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const users = await res.json();
+                
+                if (users.length > 0) {
+                    localStorage.setItem('viewUserProfile', users[0].id);
+                    window.location.reload();
+                } else {
+                    alert('User not found');
+                }
+            } catch (err) {
+                console.error('Search error:', err);
+            }
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            });
+        }
+
+        function sendMessage() {
+            const user = {
+                id: viewingUserId,
+                username: document.getElementById('username').textContent.replace('@', ''),
+                avatar_url: document.querySelector('#userAvatar img')?.src || ''
+            };
+            localStorage.setItem('currentChatUser', JSON.stringify(user));
+            window.location.href = 'userchat.html';
+        }
+
+        function editProfile() {
+            // Redirect to edit profile page or show modal
+            alert('Edit profile functionality - you can implement a modal or separate page');
+        }
+
+        function blockUser() {
+            if (confirm('Are you sure you want to block this user?')) {
+                alert('Block functionality - implement backend endpoint');
+            }
+        }
+
+        function goBack() {
+            const referrer = document.referrer;
+            if (referrer.includes('userchat.html')) {
+                window.location.href = 'userchat.html';
+            } else {
+                window.location.href = 'chat.html';
+            }
+        }
+
+        // Menu dropdown
+        document.getElementById('menuBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('menuDropdown').classList.toggle('show');
         });
-        if (!res.ok) throw new Error("Failed to load user profile");
-        const data = await res.json();
-        if (!data.success) throw new Error(data.error || "Failed to load user profile");
 
-        hideLoading();
-        const user = data.user;
-        const username = user.username || user.email.split("@")[0];
-        renderAvatar(user.avatar_url, username);
-        usernameDiv.textContent = username;
-        bioDiv.textContent = user.bio || "This user hasn't added a bio yet.";
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.menu-btn')) {
+                document.getElementById('menuDropdown').classList.remove('show');
+            }
+        });
 
-      } catch (e) {
-        statusMsg.textContent = "Failed to load user profile.";
-        console.error(e);
-      }
-    }
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            localStorage.removeItem('currentChatUser');
+            localStorage.removeItem('viewUserProfile');
+            window.location.href = 'login.html';
+        });
 
-    // Main
-    (async () => {
-      const userId = getUserIdFromUrl();
-      if (!userId) {
-        statusMsg.textContent = "No user specified.";
-        return;
-      }
-      const verified = await verifyToken();
-      if (!verified) return;
-      await fetchUserProfile(userId);
-    })();
-  </script>
+        init();
+    </script>
 </body>
 </html>
